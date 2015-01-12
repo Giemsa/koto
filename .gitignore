@@ -1,0 +1,12 @@
+proj.ios/*.xcodeproj/*
+!proj.ios/*.xcodeproj/project.pbxproj
+!proj.ios/*.xcworkspace/contents.xcworkspacedata
+UserInterfaceState.xcuserstate
+xcuserdata
+project.xcworkspace
+.DS_Store
+*.swp
+build/
+*.so
+*.o
+*.d
