@@ -1,5 +1,6 @@
 #include <iostream>
 
+#define USE_DYNAMIC_ENCODING
 
 /* install custom default allocator */
 /*
@@ -24,12 +25,18 @@ namespace koto
 #include "../../../../koto/koto.hpp"
 
 int main(int argc, const char * argv[]) {
+#ifdef USE_DYNAMIC_ENCODING
+    typedef koto::basic_string<
+        koto::default_char_type,
+        koto::dynamic_encoding<koto::default_char_type>
+    > string;
+#else
     using namespace koto;
+#endif
 
-    fixed<21>::string s = "ABCあいう";
+    string s = "12345あいうえお";
     string t = s;
-    std::cout << t.c_str() << "," << t.length() << "," << t.size() << std::endl;
-    t.append(t);
+    t = "ABCかきく";
     std::cout << t.c_str() << "," << t.length() << "," << t.size() << std::endl;
     return 0;
 }

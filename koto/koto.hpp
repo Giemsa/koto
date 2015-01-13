@@ -9,6 +9,7 @@
 #include "allocator.hpp"
 #include "config.hpp"
 #include "forward.hpp"
+#include "exception.hpp"
 #include "encoding.hpp"
 #include "string.hpp"
 #include "fixed_string.hpp"

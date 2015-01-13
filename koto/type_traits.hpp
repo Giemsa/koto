@@ -28,10 +28,7 @@ namespace koto
         struct enable_if { };
 
         template<typename T>
-        struct enable_if<true, T>
-        {
-            typedef T type;
-        };
+        struct enable_if<true, T> { typedef T type; };
 
         template<typename T>
         struct is_array : false_type { };
@@ -61,33 +58,41 @@ namespace koto
         };
 
         template<typename T>
-        struct remove_pointer
+        struct remove_pointer                     { typedef T type; };
+        template<typename T>
+        struct remove_pointer<T *>                { typedef T type; };
+        template<typename T>
+        struct remove_pointer<T * const>          { typedef T type; };
+        template<typename T>
+        struct remove_pointer<T * volatile>       { typedef T type; };
+        template<typename T>
+        struct remove_pointer<T * const volatile> { typedef T type; };
+
+
+        template<typename T>
+        struct remove_const          { typedef T type; };
+        template<typename T>
+        struct remove_const<const T> { typedef T type; };
+
+        template<typename T>
+        struct remove_volatile             { typedef T type; };
+        template<typename T>
+        struct remove_volatile<volatile T> { typedef T type; };
+
+        template<typename T>
+        struct remove_cv
         {
-            typedef T type;
+            typedef typename remove_volatile<
+                typename remove_const<T>::type
+            >::type type;
         };
 
         template<typename T>
-        struct remove_pointer<T *>
+        struct get_raw_type
         {
-            typedef T type;
-        };
-
-        template<typename T>
-        struct remove_pointer<T * const>
-        {
-            typedef T type;
-        };
-
-        template<typename T>
-        struct remove_pointer<T * volatile>
-        {
-            typedef T type;
-        };
-
-        template<typename T>
-        struct remove_pointer<T * const volatile>
-        {
-            typedef T type;
+            typedef typename remove_cv<
+                typename remove_pointer<T>::type
+            >::type type;
         };
     }
 }
