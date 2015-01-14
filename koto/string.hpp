@@ -9,6 +9,12 @@ namespace koto
     template<typename T, typename E>
     class basic_string
     {
+        template<typename U, typename V>
+        friend class basic_string;
+
+        template<typename U, typename V, size_t N>
+        friend class basic_fixed_string;
+
         typedef basic_string<T, E> self_type;
         typedef E encoding_type;
         typedef std::char_traits<T> traits_type;
@@ -128,7 +134,7 @@ namespace koto
                     string_buffer(buffer, size, size + 1);
             }
 
-            static string_buffer *create(const T *buffer, const size_t size, const size_t capacity, void *)
+            static string_buffer *create(const T *buffer, const size_t size, const size_t capacity, const encoding<T> *)
             {
                 return new(allocator::allocate(sizeof(string_buffer) + sizeof(T) * capacity))
                     string_buffer(buffer, size, capacity);
@@ -355,6 +361,13 @@ namespace koto
             buffer_->assign(str.buffer_.get_buffer(), str.buffer_.capacity());
         }
 
+        template<size_t S>
+        void assign(const basic_fixed_string<T, E, S> &str)
+        {
+            expand_buffer(str.size());
+            buffer_->assign(str.buffer_, str.size());
+        }
+
         // operator
         template<typename U>
         typename detail::enable_if<
@@ -370,6 +383,19 @@ namespace koto
         self_type &operator=(const U (&str)[S])
         {
             assign<U, S>(str);
+            return *this;
+        }
+
+        self_type &operator=(const self_type &str)
+        {
+            assign(str);
+            return *this;
+        }
+
+        template<size_t S>
+        self_type &operator=(const basic_fixed_string<T, E, S> &str)
+        {
+            assign(str);
             return *this;
         }
 

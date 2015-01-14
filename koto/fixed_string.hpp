@@ -63,6 +63,7 @@ namespace koto
         const T *c_str() const { return buffer_; }
         size_t length() const { return length_; }
         size_t size() const { return size_; }
+        size_t capacity() const { return S; }
     };
 }
 
