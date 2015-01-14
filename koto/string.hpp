@@ -40,10 +40,16 @@ namespace koto
             {
                 traits_type::copy(get_buffer(), buffer, size)[size] = 0;
             }
+        public:
+            string_buffer_with_encoding()
+            : string_buffer_base(0, 0, 0)
+            {
+                get_buffer()[0] = 0;
+            }
 
             ~string_buffer_with_encoding()
             { }
-        public:
+
             template<size_t S>
             static string_buffer_with_encoding *create(const T (&buffer)[S], const encoding<T> *encoding)
             {
@@ -106,10 +112,16 @@ namespace koto
                 traits_type::copy(get_buffer(), buffer, size)[size] = 0;
             }
 
+        public:
+            string_buffer()
+            : string_buffer_base(0, 0, 0)
+            {
+                get_buffer()[0] = 0;
+            }
+
             ~string_buffer()
             { }
 
-        public:
             static string_buffer *create(const T *buffer, const size_t size)
             {
                 return new(allocator::allocate(sizeof(string_buffer) + sizeof(T) * (size + 1)))
@@ -142,7 +154,7 @@ namespace koto
             }
 
             T *get_buffer() { return reinterpret_cast<T *>(this + 1); }
-            const T *get_buffer() const { return reinterpret_cast<const T *>(this + 1); }
+            const T *get_buffer() const { return get_buffer(); }
 
             void append(const string_buffer *buf)
             {
@@ -179,6 +191,7 @@ namespace koto
 
     private:
         static const encoding<T> *default_encoding_;
+        static buffer_type *dummy_buffer_;
         buffer_type *buffer_;
         bool has_buffer_;
 
@@ -194,6 +207,12 @@ namespace koto
         static const typename detail::enable_if<!C, default_dynamic_encoding>::type *create_default_encoding()
         {
             return NULL;
+        }
+
+        static buffer_type *create_dummy_buffer()
+        {
+            static char buf[sizeof(buffer_type) + sizeof(char_type)];
+            return new(buf) buffer_type();
         }
 
         bool expand(const size_t size)
@@ -224,6 +243,11 @@ namespace koto
 
     public:
         typedef T char_type;
+
+        basic_string()
+        : buffer_(dummy_buffer_)
+        , has_buffer_(false)
+        { }
 
         template<typename U>
         basic_string(
@@ -325,6 +349,12 @@ namespace koto
             buffer_->assign(str);
         }
 
+        void assign(const self_type &str)
+        {
+            expand_buffer(str.capacity());
+            buffer_->assign(str.buffer_.get_buffer(), str.buffer_.capacity());
+        }
+
         // operator
         template<typename U>
         typename detail::enable_if<
@@ -356,6 +386,8 @@ namespace koto
 
     template<typename T, typename E>
     const encoding<T> *basic_string<T, E>::default_encoding_ = basic_string<T, E>::create_default_encoding();
+    template<typename T, typename E>
+    typename basic_string<T, E>::buffer_type *basic_string<T, E>::dummy_buffer_ = basic_string<T, E>::create_dummy_buffer();
 }
 
 #endif

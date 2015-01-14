@@ -35,8 +35,11 @@ int main(int argc, const char * argv[]) {
 #endif
 
     string s = "12345あいうえお";
+    string t;
+    /*
     string t = s;
     t = "ABCかきく";
+    */
     std::cout << t.c_str() << "," << t.length() << "," << t.size() << std::endl;
     return 0;
 }
