@@ -11,6 +11,7 @@
 #include "forward.hpp"
 #include "exception.hpp"
 #include "encoding.hpp"
+#include "base.hpp"
 #include "string.hpp"
 #include "fixed_string.hpp"
 

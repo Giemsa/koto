@@ -7,7 +7,7 @@
 namespace koto
 {
     template<typename T, typename E>
-    class basic_string
+    class basic_string : public detail::string_base<T, E, detail::is_same<E, dynamic_encoding<T> >::value>
     {
         template<typename U, typename V>
         friend class basic_string;
@@ -18,7 +18,7 @@ namespace koto
         typedef basic_string<T, E> self_type;
         typedef E encoding_type;
         typedef std::char_traits<T> traits_type;
-        typedef typename encoding_utf8<T>::dynamic_type default_dynamic_encoding;
+        typedef detail::string_base<T, E, detail::is_same<E, dynamic_encoding<T> >::value> base_type;
 
         class string_buffer_base
         {
@@ -188,32 +188,15 @@ namespace koto
             }
         };
 
-        static const bool is_dynamic_encoding = detail::is_same<E, dynamic_encoding<T> >::value;
-
         typedef typename detail::select_type<
-            is_dynamic_encoding,
+            base_type::is_dynamic_encoding,
             string_buffer_with_encoding, string_buffer
         >::type buffer_type;
 
     private:
-        static const encoding<T> *default_encoding_;
         static buffer_type *dummy_buffer_;
         buffer_type *buffer_;
         bool has_buffer_;
-
-        // keep default encoding
-        template<bool C = is_dynamic_encoding>
-        static const typename detail::enable_if<C, default_dynamic_encoding>::type *create_default_encoding()
-        {
-            static default_dynamic_encoding instance;
-            return &instance;
-        }
-
-        template<bool C = is_dynamic_encoding>
-        static const typename detail::enable_if<!C, default_dynamic_encoding>::type *create_default_encoding()
-        {
-            return NULL;
-        }
 
         static buffer_type *create_dummy_buffer()
         {
@@ -223,7 +206,7 @@ namespace koto
 
         bool expand(const size_t size)
         {
-            buffer_type *buf = buffer_type::create(buffer_->get_buffer(), buffer_->size(), size, default_encoding_);
+            buffer_type *buf = buffer_type::create(buffer_->get_buffer(), buffer_->size(), size, this->default_encoding_);
             if(has_buffer_)
             {
                 buffer_type::destroy(buffer_);
@@ -258,7 +241,7 @@ namespace koto
         template<typename U>
         basic_string(
             const U &str,
-            typename detail::enable_if<detail::is_array<U>::value && !is_dynamic_encoding>::type* = 0
+            typename detail::enable_if<detail::is_array<U>::value && !base_type::is_dynamic_encoding>::type* = 0
         )
         : buffer_(buffer_type::create_from_buf(str))
         , has_buffer_(true)
@@ -267,9 +250,9 @@ namespace koto
         template<typename U>
         basic_string(
             const U &str,
-            typename detail::enable_if<detail::is_array<U>::value && is_dynamic_encoding>::type* = 0
+            typename detail::enable_if<detail::is_array<U>::value && base_type::is_dynamic_encoding>::type* = 0
         )
-        : buffer_(buffer_type::create(str, default_encoding_))
+        : buffer_(buffer_type::create(str, this->default_encoding_))
         , has_buffer_(true)
         { }
 
@@ -277,7 +260,7 @@ namespace koto
         basic_string(
             const U &str,
             const encoding<T> &encoding,
-            typename detail::enable_if<detail::is_array<U>::value && is_dynamic_encoding>::type* = 0
+            typename detail::enable_if<detail::is_array<U>::value && base_type::is_dynamic_encoding>::type* = 0
         )
         : buffer_(buffer_type::create(str, encoding))
         , has_buffer_(true)
@@ -399,19 +382,8 @@ namespace koto
             return *this;
         }
 
-        static void set_default_encoding(const encoding<T> *encoding)
-        {
-            default_encoding_ = encoding;
-        }
-
-        static const encoding<T> *get_default_encoding()
-        {
-            return default_encoding_;
-        }
     };
 
-    template<typename T, typename E>
-    const encoding<T> *basic_string<T, E>::default_encoding_ = basic_string<T, E>::create_default_encoding();
     template<typename T, typename E>
     typename basic_string<T, E>::buffer_type *basic_string<T, E>::dummy_buffer_ = basic_string<T, E>::create_dummy_buffer();
 }
