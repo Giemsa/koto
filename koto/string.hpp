@@ -92,15 +92,6 @@ namespace koto
                 this->length_ = encoding_->length(str, size);
                 get_buffer()[size] = 0;
             }
-
-            template<size_t S>
-            void assign(const T (&str)[S])
-            {
-                traits_type::copy(get_buffer(), str, S - 1);
-                this->size_ = S - 1;
-                this->length_ = encoding_->length(str, S - 1);
-                get_buffer()[S - 1] = 0;
-            }
         };
 
         class string_buffer /* final */ : public string_buffer_base
@@ -176,15 +167,6 @@ namespace koto
                 this->size_ = size;
                 this->length_ = encoding_type::length(str, size);
                 get_buffer()[size] = 0;
-            }
-
-            template<size_t S>
-            void assign(const T (&str)[S])
-            {
-                traits_type::copy(get_buffer(), str, S - 1);
-                this->size_ = S - 1;
-                this->length_ = encoding_type::length(str, S - 1);
-                get_buffer()[S - 1] = 0;
             }
         };
 
@@ -335,7 +317,7 @@ namespace koto
         void assign(const U (&str)[S])
         {
             expand_buffer(S);
-            buffer_->assign(str);
+            buffer_->assign(str, S);
         }
 
         void assign(const self_type &str)
