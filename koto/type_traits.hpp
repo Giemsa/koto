@@ -95,6 +95,7 @@ namespace koto
             >::type type;
         };
     }
+
 }
 
 #endif

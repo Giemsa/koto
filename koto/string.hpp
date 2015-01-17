@@ -186,6 +186,9 @@ namespace koto
             return new(buf) buffer_type();
         }
 
+        T *get_buffer() { return buffer_->get_buffer(); }
+        const T *get_buffer() const { return buffer_->get_buffer(); }
+
         bool expand(const size_t size)
         {
             buffer_type *buf = buffer_type::create(buffer_->get_buffer(), buffer_->size(), size, this->default_encoding_);
@@ -210,6 +213,17 @@ namespace koto
                 // TODO: いい感じにサイズ増やす
                 expand(s);
             }
+        }
+
+        void replace_buffer(const self_type &str)
+        {
+            if(has_buffer_)
+            {
+                buffer_type::destroy(buffer_);
+            }
+
+            buffer_ = str.buffer_;
+            has_buffer_ = false;
         }
 
     public:
@@ -241,7 +255,7 @@ namespace koto
         template<typename U>
         basic_string(
             const U &str,
-            const encoding<T> &encoding,
+            const encoding<T> *encoding,
             typename detail::enable_if<detail::is_array<U>::value && base_type::is_dynamic_encoding>::type* = 0
         )
         : buffer_(buffer_type::create(str, encoding))
@@ -322,8 +336,7 @@ namespace koto
 
         void assign(const self_type &str)
         {
-            expand_buffer(str.capacity());
-            buffer_->assign(str.buffer_.get_buffer(), str.buffer_.capacity());
+            replace_buffer(str);
         }
 
         template<size_t S>
@@ -363,7 +376,6 @@ namespace koto
             assign(str);
             return *this;
         }
-
     };
 
     template<typename T, typename E>

@@ -1,6 +1,6 @@
 #include <iostream>
 
-// #define USE_DYNAMIC_ENCODING
+#define USE_DYNAMIC_ENCODING
 
 /* install custom default allocator */
 /*
@@ -39,7 +39,7 @@ int main(int argc, const char * argv[]) {
 
     string s = "12345あいうえお";
     string t;
-    // t = fs;
-    std::cout << fs.c_str() << "," << t.length() << "," << t.size() << std::endl;
+    fs = s;
+    std::cout << fs.c_str() << "," << fs.length() << "," << fs.size() << std::endl;
     return 0;
 }

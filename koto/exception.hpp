@@ -14,7 +14,15 @@ namespace koto
         { }
     };
 
-    template<typename T, size_t S = 256>
+    class buffer_too_small_error : public std::runtime_error
+    {
+    public:
+        explicit buffer_too_small_error()
+        : runtime_error("buffer too small")
+        { }
+    };
+
+    template<typename T, size_t S = 128>
     T create_exception(const char *format, ...)
     {
         char buf[S];
@@ -23,6 +31,20 @@ namespace koto
         vsnprintf(buf, S, format, arg);
         va_end(arg);
         return T(buf);
+    }
+
+    namespace detail
+    {
+        template<bool>
+        struct compile_time_error;
+        template<>
+        struct compile_time_error<true> { };
+
+#ifdef KOTO_USE_CPP11
+#   define KOTO_STATIC_ASSERT(expr, msg) static_assert(expr, msg)
+#else
+#   define KOTO_STATIC_ASSERT(expr, msg) { typedef char assert_failed [(expr) ? 1 : -1]; }
+#endif
     }
 }
 

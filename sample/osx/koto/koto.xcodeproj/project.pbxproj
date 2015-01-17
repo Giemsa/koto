@@ -37,6 +37,7 @@
 		308B46371A641AE30002F447 /* core.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = core.h; sourceTree = "<group>"; };
 		308B46381A641AE30002F447 /* unchecked.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = unchecked.h; sourceTree = "<group>"; };
 		308B46391A641AE30002F447 /* utf8.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = utf8.h; sourceTree = "<group>"; };
+		3090C0901A6ACF62001D95DD /* undef_macros.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = undef_macros.hpp; sourceTree = "<group>"; };
 		30A7B0FE1A6552D1001F2121 /* exception.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = exception.hpp; sourceTree = "<group>"; };
 		7A37CFF71A67E3E100DD60E4 /* base.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = base.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -83,6 +84,7 @@
 				308B46341A641AE30002F447 /* utf8 */,
 				30A7B0FE1A6552D1001F2121 /* exception.hpp */,
 				7A37CFF71A67E3E100DD60E4 /* base.hpp */,
+				3090C0901A6ACF62001D95DD /* undef_macros.hpp */,
 			);
 			name = koto;
 			path = ../../../koto;
@@ -174,7 +176,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++98";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -214,7 +216,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++98";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;

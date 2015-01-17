@@ -46,4 +46,5 @@ namespace koto
     }
 }
 
+#include "undef_macros.hpp"
 #endif
