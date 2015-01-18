@@ -94,6 +94,12 @@ namespace koto
                 typename remove_pointer<T>::type
             >::type type;
         };
+
+        template<typename T>
+        struct is_const : public false_type { };
+
+        template<typename T>
+        struct is_const<T const> : public true_type { };
     }
 
 }

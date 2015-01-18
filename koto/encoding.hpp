@@ -12,16 +12,20 @@ namespace koto
     class encoding
     {
     protected:
-        typedef basic_vchar_t<T, vchar_buffer_size, dynamic_encoding<T> > char_type;
+        typedef basic_vchar_t<T, vchar_buffer_size, dynamic_encoding<T> > element_type;
     private:
     public:
         encoding() { }
         virtual ~encoding() { }
 
         virtual size_t length(const T *str, const size_t len) const = 0;
+        virtual element_type element(const T *str, const size_t index) const = 0;
+        virtual element_type element(const T *str) const = 0;
+        virtual void advance(const T *&str, const size_t n) const = 0;
+        virtual void next(const T *&str) const = 0;
+        virtual void prev(const T *&str) const = 0;
+
         virtual bool accept_write_element() const = 0;
-        virtual char_type element(const T *str, const size_t index) = 0;
-        virtual const char_type element(const T *str, const size_t index) const = 0;
     };
 
     template<typename T>
@@ -45,14 +49,29 @@ namespace koto
                 return E::length(str, len);
             }
 
-            typename encoding<T>::char_type element(const T *str, const size_t index) // override
+            typename encoding<T>::element_type element(const T *str, const size_t index) const // override
             {
                 return E::template element<dynamic_encoding<T> >(str, index).with(this);
             }
 
-            const typename encoding<T>::char_type element(const T *str, const size_t index) const // override
+            typename encoding<T>::element_type element(const T *str) const // override
             {
-                return E::template element<dynamic_encoding<T> >(str, index).with(this);
+                return E::template element<dynamic_encoding<T> >(str).with(this);
+            }
+
+            void advance(const T *&str, const size_t n) const // override
+            {
+                return E::advance(str, n);
+            }
+
+            void next(const T *&str) const // override
+            {
+                return E::next(str);
+            }
+
+            void prev(const T *&str) const // override
+            {
+                return E::prev(str);
             }
 
             bool accept_write_element() const { return E::accept_write_element; } // override
@@ -86,6 +105,18 @@ namespace koto
             utf8::unchecked::next(str);
             return basic_vchar_t<T, vchar_buffer_size, E>(f, str - f);
         }
+
+        template<typename E>
+        static basic_vchar_t<T, vchar_buffer_size, E> element(const T *str)
+        {
+            const T *f = str;
+            utf8::unchecked::next(str);
+            return basic_vchar_t<T, vchar_buffer_size, E>(f, str - f);
+        }
+
+        static void advance(const T *&str, const size_t n) { utf8::unchecked::advance(str, n); }
+        static void next(const T *&str) { utf8::unchecked::next(str); }
+        static void prev(const T *&str) { utf8::unchecked::previous(str); }
     };
 
     /* ascii */
@@ -99,16 +130,23 @@ namespace koto
         encoding_ascii() { }
         ~encoding_ascii() { }
 
-        static size_t length(const T *str, const size_t len)
-        {
-            return len;
-        }
+        static size_t length(const T *str, const size_t len) { return len; }
 
         template<typename E>
         static basic_vchar_t<T, vchar_buffer_size, E> element(const T *str, const size_t index)
         {
             return basic_vchar_t<T, vchar_buffer_size, E>(&str[index], 1);
         }
+
+        template<typename E>
+        static basic_vchar_t<T, vchar_buffer_size, E> element(const T *str)
+        {
+            return basic_vchar_t<T, vchar_buffer_size, E>(str, 1);
+        }
+
+        static void advance(const T *&str, const size_t n) { str += n; }
+        static void next(const T *&str) { ++str; }
+        static void prev(const T *&str) { --str; }
     };
 }
 

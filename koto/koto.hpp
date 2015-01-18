@@ -12,6 +12,7 @@
 #include "exception.hpp"
 #include "vchar.hpp"
 #include "encoding.hpp"
+#include "iterator.hpp"
 #include "base.hpp"
 #include "string.hpp"
 #include "fixed_string.hpp"

@@ -24,7 +24,7 @@
 
 /* Begin PBXFileReference section */
 		308B46211A641AC80002F447 /* koto */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = koto; sourceTree = BUILT_PRODUCTS_DIR; };
-		308B46241A641AC80002F447 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = koto/main.cpp; sourceTree = "<group>"; };
+		308B46241A641AC80002F447 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = ../sample/osx/koto/koto/main.cpp; sourceTree = "<group>"; };
 		308B462C1A641AE30002F447 /* allocator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = allocator.hpp; sourceTree = "<group>"; };
 		308B462D1A641AE30002F447 /* config.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = config.hpp; sourceTree = "<group>"; };
 		308B462E1A641AE30002F447 /* forward.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = forward.hpp; sourceTree = "<group>"; };
@@ -39,6 +39,7 @@
 		308B46391A641AE30002F447 /* utf8.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = utf8.h; sourceTree = "<group>"; };
 		3090C0901A6ACF62001D95DD /* undef_macros.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = undef_macros.hpp; sourceTree = "<group>"; };
 		3090C0911A6B115F001D95DD /* vchar.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = vchar.hpp; sourceTree = "<group>"; };
+		30A1444D1A6BAFA600E617AD /* iterator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = iterator.hpp; sourceTree = "<group>"; };
 		30A7B0FE1A6552D1001F2121 /* exception.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = exception.hpp; sourceTree = "<group>"; };
 		7A37CFF71A67E3E100DD60E4 /* base.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = base.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -58,7 +59,6 @@
 			isa = PBXGroup;
 			children = (
 				308B462B1A641AE30002F447 /* koto */,
-				308B46241A641AC80002F447 /* main.cpp */,
 				308B46221A641AC80002F447 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -87,6 +87,8 @@
 				7A37CFF71A67E3E100DD60E4 /* base.hpp */,
 				3090C0901A6ACF62001D95DD /* undef_macros.hpp */,
 				3090C0911A6B115F001D95DD /* vchar.hpp */,
+				30A1444D1A6BAFA600E617AD /* iterator.hpp */,
+				308B46241A641AC80002F447 /* main.cpp */,
 			);
 			name = koto;
 			path = ../../../koto;

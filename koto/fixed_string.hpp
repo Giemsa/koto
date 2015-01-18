@@ -19,7 +19,9 @@ namespace koto
         typedef basic_fixed_string<T, E, S> self_type;
         typedef std::char_traits<T> traits_type;
         typedef detail::string_base<T, E, detail::is_same<E, dynamic_encoding<T> >::value> base_type;
-
+    public:
+        typedef T char_type;
+    private:
         class string_buffer_base
         {
         protected:

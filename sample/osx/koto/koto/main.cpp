@@ -39,13 +39,15 @@ int main(int argc, const char * argv[]) {
 #else
     using namespace koto;
 #endif
-    koto::encoding_ascii<koto::default_char_type>::dynamic_type enc;
+    koto::encoding_utf8<koto::default_char_type>::dynamic_type enc;
 
     string::set_default_encoding(&enc);
-    string s = "12345あいうえお";
-    
-    vchar_t c = s[4];
-    string t;
-    std::cout << /*s.c_str()*/ c << "," << s.length() << "," << s.size() << std::endl;
+    string s = "こんにちは123ABCこんばんは";
+
+    for(string::const_iterator it = s.begin(); it != s.end(); ++it)
+    {
+        std::cout << *it << "\n";
+    }
+
     return 0;
 }

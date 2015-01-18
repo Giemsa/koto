@@ -15,12 +15,20 @@ namespace koto
         template<typename U, typename V, size_t N>
         friend class basic_fixed_string;
 
+        template<typename U, typename V, typename F>
+        friend class detail::bidirectional_iterator;
+
         typedef basic_string<T, E> self_type;
         typedef E encoding_type;
         typedef std::char_traits<T> traits_type;
         typedef detail::string_base<T, E, detail::is_same<E, dynamic_encoding<T> >::value> base_type;
-        typedef basic_vchar_t<T, vchar_buffer_size, E> char_type;
+    public:
+        typedef T char_type;
+        typedef basic_vchar_t<T, vchar_buffer_size, E> element_type;
+        typedef detail::bidirectional_iterator<self_type, T, E> iterator;
+        typedef detail::bidirectional_iterator<const self_type, const T, E> const_iterator;
 
+    private:
         class string_buffer_base
         {
         protected:
@@ -78,6 +86,7 @@ namespace koto
 
             T *get_buffer() { return reinterpret_cast<T *>(this + 1); }
             const T *get_buffer() const { return reinterpret_cast<const T *>(this + 1); }
+            const encoding<T> *get_encoding() const { return encoding_; }
 
             void append(const T *str, const size_t len)
             {
@@ -94,12 +103,12 @@ namespace koto
                 get_buffer()[size] = 0;
             }
 
-            char_type element(const size_t index)
+            element_type element(const size_t index)
             {
                 return encoding_->element(get_buffer(), index);
             }
 
-            const char_type element(const size_t index) const
+            const element_type element(const size_t index) const
             {
                 return encoding_->element(get_buffer(), index);
             }
@@ -163,6 +172,7 @@ namespace koto
 
             T *get_buffer() { return reinterpret_cast<T *>(this + 1); }
             const T *get_buffer() const { return reinterpret_cast<const T *>(this + 1); }
+            const encoding<T> *get_encoding() const { return NULL; }
 
             void append(const string_buffer *buf)
             {
@@ -181,12 +191,12 @@ namespace koto
             }
 
             template<bool C = encoding_type::accept_write_element>
-            char_type element(const size_t index, const typename detail::enable_if<C>::type* = 0)
+            element_type element(const size_t index, const typename detail::enable_if<C>::type* = 0)
             {
                 return encoding_type::element(get_buffer(), index);
             }
 
-            const char_type element(const size_t index) const
+            const element_type element(const size_t index) const
             {
                 return encoding_type::element(get_buffer(), index);
             }
@@ -323,6 +333,7 @@ namespace koto
         size_t length() const { return buffer_->length(); }
         size_t size() const { return buffer_->size(); }
         size_t capacity() const { return buffer_->capacity(); }
+        const encoding<T> *get_encoding() const { return buffer_->get_encoding(); }
 
         // append
         self_type &append(const basic_string<T, E> &str)
@@ -367,7 +378,7 @@ namespace koto
         }
 
         template<bool C = encoding_type::accept_write_element>
-        typename detail::enable_if<C, char_type>::type at(const size_t index)
+        typename detail::enable_if<C, element_type>::type at(const size_t index)
         {
             if(index >= buffer_->length())
             {
@@ -377,7 +388,7 @@ namespace koto
             return buffer_->element(index);
         }
 
-        const T at(const size_t index) const
+        const element_type at(const size_t index) const
         {
             if(index >= buffer_->length())
             {
@@ -419,15 +430,39 @@ namespace koto
         }
 
         template<bool C = encoding_type::accept_write_element>
-        typename detail::enable_if<C, char_type>::type operator[](const size_t index)
+        typename detail::enable_if<C, element_type>::type operator[](const size_t index)
         {
             return buffer_->element(index);
         }
 
-        const char_type operator[](const size_t index) const
+        const element_type operator[](const size_t index) const
         {
             return buffer_->element(index);
         }
+
+        // iterator
+        iterator begin()
+        {
+            return iterator(this);
+        }
+
+        iterator end()
+        {
+            return iterator(this, get_buffer() + size());
+        }
+
+        const_iterator cbegin() const
+        {
+            return const_iterator(this);
+        }
+
+        const_iterator cend() const
+        {
+            return const_iterator(this, get_buffer() + size());
+        }
+
+        const_iterator begin() const { return cbegin(); }
+        const_iterator end() const { return cend(); }
     };
 
     template<typename T, typename E>
