@@ -6,11 +6,31 @@
 
 namespace koto
 {
-    // koto::basic_string in string.hpp
+    // in encoding.hpp
+    template<typename T>
+    class encoding;
+
+    template<typename T>
+    class dynamic_encoding;
+
+    template<typename T>
+    class encoding_utf8;
+
+    template<typename T>
+    class encoding_ascii;
+
+    // int base.hpp
+    namespace detail
+    {
+        template<typename T, typename E, bool D>
+        class string_base;
+    }
+
+    // in string.hpp
     template<typename T, typename E>
     class basic_string;
 
-    // koto::basic_fixed_string in fixed_string.hpp
+    // in fixed_string.hpp
     template<typename T, typename E, size_t S>
     class basic_fixed_string;
 }

@@ -1,3 +1,6 @@
+// Copyright Giemsa 2015
+// Distributed under the Boost Software License, Version 1.0
+
 #ifndef MW_KOTO_EXCEPTION_HPP
 #define MW_KOTO_EXCEPTION_HPP
 
@@ -19,6 +22,22 @@ namespace koto
     public:
         explicit buffer_too_small_error()
         : runtime_error("buffer too small")
+        { }
+    };
+
+    class bad_char_error : public std::runtime_error
+    {
+    public:
+        explicit bad_char_error()
+        : runtime_error("only one char should be specified")
+        { }
+    };
+
+    class not_implemented : public std::logic_error
+    {
+    public:
+        explicit not_implemented()
+        : logic_error("this method is unimplemented")
         { }
     };
 

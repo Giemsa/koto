@@ -37,6 +37,9 @@ int main(int argc, const char * argv[]) {
     koto::basic_fixed_string<koto::default_char_type, koto::dynamic_encoding<koto::default_char_type>, 21> fs = "123あいう";
     // koto::fixed<22>::string fs = "123あいう";
 
+    koto::vchar_t v = "あ";
+    std::cout << v << std::endl;
+
     string s = "12345あいうえお";
     string t;
     fs = s;

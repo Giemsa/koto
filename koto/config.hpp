@@ -27,4 +27,9 @@
 #   endif
 #endif
 
+namespace koto
+{
+    typedef KOTO_DEFAULT_CHAR_TYPE default_char_type;
+}
+
 #endif

@@ -168,6 +168,14 @@ namespace koto
                 this->length_ = encoding_type::length(str, size);
                 get_buffer()[size] = 0;
             }
+
+            T &element(const size_t index)
+            {
+            }
+
+            const T element(const size_t index) const
+            {
+            }
         };
 
         typedef typename detail::select_type<
@@ -346,6 +354,26 @@ namespace koto
             buffer_->assign(str.buffer_, str.size());
         }
 
+        T &at(const size_t index)
+        {
+            if(index >= buffer_->length())
+            {
+                throw std::out_of_range("out of range");
+            }
+
+            return 0;
+        }
+
+        const T at(const size_t index) const
+        {
+            if(index >= buffer_->length())
+            {
+                throw std::out_of_range("out of range");
+            }
+
+            return 0;
+        }
+
         // operator
         template<typename U>
         typename detail::enable_if<
@@ -375,6 +403,16 @@ namespace koto
         {
             assign(str);
             return *this;
+        }
+
+        T &operator[](const size_t index)
+        {
+            return 0;
+        }
+
+        const T operator[](const size_t index) const
+        {
+            return 0;
         }
     };
 

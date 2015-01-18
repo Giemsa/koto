@@ -1,3 +1,6 @@
+// Copyright Giemsa 2015
+// Distributed under the Boost Software License, Version 1.0
+
 #ifndef MW_KOTO_UNDEF_MACROS_HPP
 #define MW_KOTO_UNDEF_MACROS_HPP
 

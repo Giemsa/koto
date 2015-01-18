@@ -10,6 +10,7 @@
 #include "config.hpp"
 #include "forward.hpp"
 #include "exception.hpp"
+#include "vchar.hpp"
 #include "encoding.hpp"
 #include "base.hpp"
 #include "string.hpp"
@@ -22,8 +23,6 @@ namespace koto
     SET_DEFAULT_ENCODING(KOTO_DEFAULT_ENCODING);
 #undef SET_DEFAULT_ENCODING
 #undef SET_DEFAULT_ENCODING_
-
-    typedef KOTO_DEFAULT_CHAR_TYPE default_char_type;
 
     typedef basic_string<default_char_type, default_encoding::static_type > string;
     typedef basic_string<default_char_type, encoding_ascii<default_char_type>::static_type > simple_string;

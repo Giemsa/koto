@@ -175,7 +175,7 @@ namespace koto
                 throw buffer_too_small_error();
             }
 
-            buffer_.assign(str.get_buffer(), str.size());
+            buffer_.string_buffer_base::assign(str.get_buffer(), str.size(), str.length());
         }
 
         template<size_t N>
@@ -184,7 +184,7 @@ namespace koto
             const typename detail::enable_if<N <= S>::type* = 0
         )
         {
-            buffer_.assign(str.buffer_.get_buffer(), N - 1);
+            buffer_.string_buffer_base::assign(str.buffer_.get_buffer(), str.size(), str.length());
         }
 
         // operator
