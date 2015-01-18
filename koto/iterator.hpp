@@ -72,7 +72,17 @@ namespace koto
                 return E::template element<E>(buffer_);
             }
 
+            const basic_vchar_t<typename T::char_type, vchar_buffer_size, E> operator*() const
+            {
+                return E::template element<E>(buffer_);
+            }
+
             basic_vchar_t<typename T::char_type, vchar_buffer_size, E> operator->()
+            {
+                return E::template element<E>(buffer_);
+            }
+
+            const basic_vchar_t<typename T::char_type, vchar_buffer_size, E> operator->() const
             {
                 return E::template element<E>(buffer_);
             }
@@ -153,7 +163,17 @@ namespace koto
                 return str_->get_encoding()->template element(buffer_);
             }
 
+            const basic_vchar_t<typename T::char_type, vchar_buffer_size, encoding_type> operator*() const
+            {
+                return str_->get_encoding()->template element(buffer_);
+            }
+
             basic_vchar_t<typename T::char_type, vchar_buffer_size, encoding_type> operator->()
+            {
+                return str_->get_encoding()->template element(buffer_);
+            }
+
+            const basic_vchar_t<typename T::char_type, vchar_buffer_size, encoding_type> operator->() const
             {
                 return str_->get_encoding()->template element(buffer_);
             }
