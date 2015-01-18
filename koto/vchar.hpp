@@ -136,33 +136,36 @@ namespace koto
 
             typedef vchar_base base;
         private:
-            encoding<T> *encoding_;
+            const encoding<T> *encoding_;
         public:
-            /*
             vchar_with_encoding(const char *str, const size_t size, const encoding<T> *enc)
-            : value_type_(value_types::char_value)
+            : base(value_types::char_value)
             {
-                write(str, size);
+                base::write(str, size);
             }
 
             vchar_with_encoding(const wchar_t *str, const size_t size, const encoding<T> *enc)
-            : value_type_(value_types::u32_value)
+            : base(value_types::u32_value)
             {
-                write(str, size);
+                base::write(str, size);
             }
 
             vchar_with_encoding(const uint16 *str, const size_t size, const encoding<T> *enc)
-            : value_type_(value_types::u16_value)
+            : base(value_types::u16_value)
             {
-                write(str, size);
+                base::write(str, size);
             }
 
             vchar_with_encoding(const uint32 *str, const size_t size, const encoding<T> *enc)
-            : value_type_(value_types::u32_value)
+            : base(value_types::u32_value)
             {
-                write(str, size);
+                base::write(str, size);
             }
-            */
+
+            void set_encoding(const encoding<T> *enc)
+            {
+                encoding_ = enc;
+            }
         };
 
         typedef typename detail::select_type<
@@ -198,6 +201,13 @@ namespace koto
 
         ~basic_vchar_t()
         {
+        }
+
+        template<bool C = base_type::is_dynamic_encoding>
+        self_type &with(const encoding<T> *enc, const typename detail::enable_if<C>::type* = 0)
+        {
+            value_.set_encoding(enc);
+            return *this;
         }
 
         const char *c_str() const { return value_.c_str(); }

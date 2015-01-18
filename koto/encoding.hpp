@@ -11,16 +11,25 @@ namespace koto
     template<typename T>
     class encoding
     {
+    protected:
+        typedef basic_vchar_t<T, vchar_buffer_size, dynamic_encoding<T> > char_type;
     private:
     public:
         encoding() { }
         virtual ~encoding() { }
 
         virtual size_t length(const T *str, const size_t len) const = 0;
+        virtual bool accept_write_element() const = 0;
+        virtual char_type element(const T *str, const size_t index) = 0;
+        virtual const char_type element(const T *str, const size_t index) const = 0;
     };
 
     template<typename T>
-    class dynamic_encoding { };
+    class dynamic_encoding
+    {
+    public:
+        static const bool accept_write_element = true;
+    };
 
     template<typename T, typename E>
     class static_encoding
@@ -28,8 +37,6 @@ namespace koto
         class encoding_wrapper : public encoding<T>
         {
         public:
-            static const bool accept_write_element = E::accept_write_element;
-
             encoding_wrapper() { }
             encoding_wrapper(const static_encoding<T, E> &enc) { }
 
@@ -37,6 +44,18 @@ namespace koto
             {
                 return E::length(str, len);
             }
+
+            typename encoding<T>::char_type element(const T *str, const size_t index) // override
+            {
+                return E::template element<dynamic_encoding<T> >(str, index).with(this);
+            }
+
+            const typename encoding<T>::char_type element(const T *str, const size_t index) const // override
+            {
+                return E::template element<dynamic_encoding<T> >(str, index).with(this);
+            }
+
+            bool accept_write_element() const { return E::accept_write_element; } // override
         };
     public:
         typedef encoding_wrapper dynamic_type;
@@ -59,10 +78,13 @@ namespace koto
             return utf8::distance(str, str + len);
         }
 
-        static T element(const T *str, const size_t index)
+        template<typename E>
+        static basic_vchar_t<T, vchar_buffer_size, E> element(const T *str, const size_t index)
         {
             utf8::unchecked::advance(str, index);
-            return *str;
+            const T *f = str;
+            utf8::unchecked::next(str);
+            return basic_vchar_t<T, vchar_buffer_size, E>(f, str - f);
         }
     };
 
@@ -82,9 +104,10 @@ namespace koto
             return len;
         }
 
-        static T element(const T *str, const size_t index)
+        template<typename E>
+        static basic_vchar_t<T, vchar_buffer_size, E> element(const T *str, const size_t index)
         {
-            return str[index];
+            return basic_vchar_t<T, vchar_buffer_size, E>(&str[index], 1);
         }
     };
 }

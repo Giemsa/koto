@@ -30,6 +30,8 @@
 namespace koto
 {
     typedef KOTO_DEFAULT_CHAR_TYPE default_char_type;
+
+    static const int vchar_buffer_size = 4;
 }
 
 #endif

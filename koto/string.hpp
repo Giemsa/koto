@@ -19,6 +19,7 @@ namespace koto
         typedef E encoding_type;
         typedef std::char_traits<T> traits_type;
         typedef detail::string_base<T, E, detail::is_same<E, dynamic_encoding<T> >::value> base_type;
+        typedef basic_vchar_t<T, vchar_buffer_size, E> char_type;
 
         class string_buffer_base
         {
@@ -76,7 +77,7 @@ namespace koto
             }
 
             T *get_buffer() { return reinterpret_cast<T *>(this + 1); }
-            const T *get_buffer() const { return get_buffer(); }
+            const T *get_buffer() const { return reinterpret_cast<const T *>(this + 1); }
 
             void append(const T *str, const size_t len)
             {
@@ -91,6 +92,16 @@ namespace koto
                 this->size_ = size;
                 this->length_ = encoding_->length(str, size);
                 get_buffer()[size] = 0;
+            }
+
+            char_type element(const size_t index)
+            {
+                return encoding_->element(get_buffer(), index);
+            }
+
+            const char_type element(const size_t index) const
+            {
+                return encoding_->element(get_buffer(), index);
             }
         };
 
@@ -151,7 +162,7 @@ namespace koto
             }
 
             T *get_buffer() { return reinterpret_cast<T *>(this + 1); }
-            const T *get_buffer() const { return get_buffer(); }
+            const T *get_buffer() const { return reinterpret_cast<const T *>(this + 1); }
 
             void append(const string_buffer *buf)
             {
@@ -169,12 +180,15 @@ namespace koto
                 get_buffer()[size] = 0;
             }
 
-            T &element(const size_t index)
+            template<bool C = encoding_type::accept_write_element>
+            char_type element(const size_t index, const typename detail::enable_if<C>::type* = 0)
             {
+                return encoding_type::element(get_buffer(), index);
             }
 
-            const T element(const size_t index) const
+            const char_type element(const size_t index) const
             {
+                return encoding_type::element(get_buffer(), index);
             }
         };
 
@@ -235,8 +249,6 @@ namespace koto
         }
 
     public:
-        typedef T char_type;
-
         basic_string()
         : buffer_(dummy_buffer_)
         , has_buffer_(false)
@@ -354,14 +366,15 @@ namespace koto
             buffer_->assign(str.buffer_, str.size());
         }
 
-        T &at(const size_t index)
+        template<bool C = encoding_type::accept_write_element>
+        typename detail::enable_if<C, char_type>::type at(const size_t index)
         {
             if(index >= buffer_->length())
             {
                 throw std::out_of_range("out of range");
             }
 
-            return 0;
+            return buffer_->element(index);
         }
 
         const T at(const size_t index) const
@@ -371,7 +384,7 @@ namespace koto
                 throw std::out_of_range("out of range");
             }
 
-            return 0;
+            return buffer_->element(index);
         }
 
         // operator
@@ -405,14 +418,15 @@ namespace koto
             return *this;
         }
 
-        T &operator[](const size_t index)
+        template<bool C = encoding_type::accept_write_element>
+        typename detail::enable_if<C, char_type>::type operator[](const size_t index)
         {
-            return 0;
+            return buffer_->element(index);
         }
 
-        const T operator[](const size_t index) const
+        const char_type operator[](const size_t index) const
         {
-            return 0;
+            return buffer_->element(index);
         }
     };
 

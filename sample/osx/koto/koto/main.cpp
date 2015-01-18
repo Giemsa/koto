@@ -30,19 +30,22 @@ int main(int argc, const char * argv[]) {
         koto::default_char_type,
         koto::dynamic_encoding<koto::default_char_type>
     > string;
+
+    typedef koto::basic_vchar_t<
+        koto::default_char_type,
+        koto::vchar_buffer_size,
+        koto::dynamic_encoding<koto::default_char_type>
+    > vchar_t;
 #else
     using namespace koto;
 #endif
+    koto::encoding_ascii<koto::default_char_type>::dynamic_type enc;
 
-    koto::basic_fixed_string<koto::default_char_type, koto::dynamic_encoding<koto::default_char_type>, 21> fs = "123あいう";
-    // koto::fixed<22>::string fs = "123あいう";
-
-    koto::vchar_t v = "あ";
-    std::cout << v << std::endl;
-
+    string::set_default_encoding(&enc);
     string s = "12345あいうえお";
+    
+    vchar_t c = s[4];
     string t;
-    fs = s;
-    std::cout << fs.c_str() << "," << fs.length() << "," << fs.size() << std::endl;
+    std::cout << /*s.c_str()*/ c << "," << s.length() << "," << s.size() << std::endl;
     return 0;
 }
