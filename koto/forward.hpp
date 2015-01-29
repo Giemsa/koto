@@ -7,31 +7,30 @@
 namespace koto
 {
     // in encoding.hpp
-    template<typename T>
     class encoding;
-
-    template<typename T>
     class dynamic_encoding;
-
-    template<typename T>
     class encoding_utf8;
-
-    template<typename T>
     class encoding_ascii;
 
-    // int base.hpp
+    // in base.hpp
+    /*
     namespace detail
     {
-        template<typename T, typename E, bool D>
+        template<typename E, bool D>
         class string_base;
     }
+    */
+
+    // in vchar.h
+    template<size_t S, typename E>
+    class basic_vchar_t;
 
     // in string.hpp
-    template<typename T, typename E>
+    template<typename E>
     class basic_string;
 
     // in fixed_string.hpp
-    template<typename T, typename E, size_t S>
+    template<typename E, size_t S>
     class basic_fixed_string;
 }
 

@@ -10,10 +10,6 @@
 #   define KOTO_DEFAULT_ENCODING utf8
 #endif
 
-#ifndef KOTO_DEFAULT_CHAR_TYPE
-#   define KOTO_DEFAULT_CHAR_TYPE char
-#endif
-
 #ifndef KOTO_DISABLE_CPP11
 #   define KOTO_DISABLE_CPP11 0
 #endif
@@ -29,8 +25,6 @@
 
 namespace koto
 {
-    typedef KOTO_DEFAULT_CHAR_TYPE default_char_type;
-
     static const int vchar_buffer_size = 4;
 }
 

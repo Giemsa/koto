@@ -6,27 +6,29 @@
 
 namespace koto
 {
-    template<typename T, typename E>
-    class basic_string : public detail::string_base<T, E, detail::is_same<E, dynamic_encoding<T> >::value>
+    template<typename E>
+    class basic_string : public detail::string_base<E, detail::is_same<E, dynamic_encoding>::value>
     {
-        template<typename U, typename V>
+    public:
+        typedef typename E::char_type char_type;
+    private:
+        template<typename V>
         friend class basic_string;
 
-        template<typename U, typename V, size_t N>
+        template<typename V, size_t N>
         friend class basic_fixed_string;
 
-        template<typename U, typename V, typename F>
+        template<typename V, typename F>
         friend class detail::bidirectional_iterator;
 
-        typedef basic_string<T, E> self_type;
+        typedef basic_string<E> self_type;
         typedef E encoding_type;
-        typedef std::char_traits<T> traits_type;
-        typedef detail::string_base<T, E, detail::is_same<E, dynamic_encoding<T> >::value> base_type;
+        typedef std::char_traits<char_type> traits_type;
+        typedef detail::string_base<E, detail::is_same<E, dynamic_encoding>::value> base_type;
     public:
-        typedef T char_type;
-        typedef basic_vchar_t<T, vchar_buffer_size, E> element_type;
-        typedef detail::bidirectional_iterator<self_type, T, E> iterator;
-        typedef detail::bidirectional_iterator<const self_type, const T, E> const_iterator;
+        typedef basic_vchar_t<vchar_buffer_size, E> element_type;
+        typedef detail::bidirectional_iterator<self_type, E> iterator;
+        typedef detail::bidirectional_iterator<const self_type, E> const_iterator;
 
     private:
         class string_buffer_base
@@ -48,9 +50,9 @@ namespace koto
         class string_buffer_with_encoding : public string_buffer_base
         {
         private:
-            const encoding<T> *encoding_;
+            const encoding *encoding_;
 
-            string_buffer_with_encoding(const T *buffer, const size_t size, const size_t capacity, const encoding<T> *encoding)
+            string_buffer_with_encoding(const char_type *buffer, const size_t size, const size_t capacity, const encoding *encoding)
             : string_buffer_base(encoding->length(buffer, size), size, capacity), encoding_(encoding)
             {
                 traits_type::copy(get_buffer(), buffer, size)[size] = 0;
@@ -66,15 +68,15 @@ namespace koto
             { }
 
             template<size_t S>
-            static string_buffer_with_encoding *create(const T (&buffer)[S], const encoding<T> *encoding)
+            static string_buffer_with_encoding *create(const char_type (&buffer)[S], const encoding *encoding)
             {
-                return new(allocator::allocate(sizeof(string_buffer_with_encoding) + sizeof(T) * S))
+                return new(allocator::allocate(sizeof(string_buffer_with_encoding) + sizeof(char_type) * S))
                     string_buffer_with_encoding(buffer, S - 1, S, encoding);
             }
 
-            static string_buffer_with_encoding *create(const T *buffer, const size_t size, const size_t capacity, const encoding<T> *encoding)
+            static string_buffer_with_encoding *create(const char_type *buffer, const size_t size, const size_t capacity, const encoding *encoding)
             {
-                return new(allocator::allocate(sizeof(string_buffer_with_encoding) + sizeof(T) * capacity))
+                return new(allocator::allocate(sizeof(string_buffer_with_encoding) + sizeof(char_type) * capacity))
                     string_buffer_with_encoding(buffer, size, capacity, encoding);
             }
 
@@ -84,18 +86,18 @@ namespace koto
                 allocator::deallocate(p);
             }
 
-            T *get_buffer() { return reinterpret_cast<T *>(this + 1); }
-            const T *get_buffer() const { return reinterpret_cast<const T *>(this + 1); }
-            const encoding<T> *get_encoding() const { return encoding_; }
+            char_type *get_buffer() { return reinterpret_cast<char_type *>(this + 1); }
+            const char_type *get_buffer() const { return reinterpret_cast<const char_type *>(this + 1); }
+            const encoding *get_encoding() const { return encoding_; }
 
-            void append(const T *str, const size_t len)
+            void append(const char_type *str, const size_t len)
             {
                 traits_type::copy(get_buffer() + this->length_, str, len);
                 this->length_ += len;
                 get_buffer()[this->length_] = 0;
             }
 
-            void assign(const T *str, const size_t size)
+            void assign(const char_type *str, const size_t size)
             {
                 traits_type::copy(get_buffer(), str, size);
                 this->size_ = size;
@@ -117,13 +119,13 @@ namespace koto
         class string_buffer /* final */ : public string_buffer_base
         {
         private:
-            string_buffer(const T *buffer, const size_t size, const size_t capacity)
+            string_buffer(const char_type *buffer, const size_t size, const size_t capacity)
             : string_buffer_base(encoding_type::length(buffer, size), size, capacity)
             {
                 traits_type::copy(get_buffer(), buffer, size)[size] = 0;
             }
 
-            string_buffer(const T *buffer, const size_t len, const size_t size, const size_t capacity)
+            string_buffer(const char_type *buffer, const size_t len, const size_t size, const size_t capacity)
             : string_buffer_base(len, size, capacity)
             {
                 traits_type::copy(get_buffer(), buffer, size)[size] = 0;
@@ -139,29 +141,29 @@ namespace koto
             ~string_buffer()
             { }
 
-            static string_buffer *create(const T *buffer, const size_t size)
+            static string_buffer *create(const char_type *buffer, const size_t size)
             {
-                return new(allocator::allocate(sizeof(string_buffer) + sizeof(T) * (size + 1)))
+                return new(allocator::allocate(sizeof(string_buffer) + sizeof(char_type) * (size + 1)))
                     string_buffer(buffer, size, size + 1);
             }
 
-            static string_buffer *create(const T *buffer, const size_t size, const size_t capacity, const encoding<T> *)
+            static string_buffer *create(const char_type *buffer, const size_t size, const size_t capacity, const encoding *)
             {
-                return new(allocator::allocate(sizeof(string_buffer) + sizeof(T) * capacity))
+                return new(allocator::allocate(sizeof(string_buffer) + sizeof(char_type) * capacity))
                     string_buffer(buffer, size, capacity);
             }
 
             template<size_t S>
-            static string_buffer *create_from_buf(const T (&buffer)[S])
+            static string_buffer *create_from_buf(const char_type (&buffer)[S])
             {
-                return new(allocator::allocate(sizeof(string_buffer) + sizeof(T) * S))
+                return new(allocator::allocate(sizeof(string_buffer) + sizeof(char_type) * S))
                     string_buffer(buffer, S - 1, S);
             }
 
             template<size_t S>
-            static string_buffer *create_from_buf(const T (&buffer)[S], const size_t len, const size_t size)
+            static string_buffer *create_from_buf(const char_type (&buffer)[S], const size_t len, const size_t size)
             {
-                return new(allocator::allocate(sizeof(string_buffer) + sizeof(T) * S)) string_buffer(buffer, len, size, S);
+                return new(allocator::allocate(sizeof(string_buffer) + sizeof(char_type) * S)) string_buffer(buffer, len, size, S);
             }
 
             static void destroy(string_buffer *p)
@@ -170,9 +172,9 @@ namespace koto
                 allocator::deallocate(p);
             }
 
-            T *get_buffer() { return reinterpret_cast<T *>(this + 1); }
-            const T *get_buffer() const { return reinterpret_cast<const T *>(this + 1); }
-            const encoding<T> *get_encoding() const { return NULL; }
+            char_type *get_buffer() { return reinterpret_cast<char_type *>(this + 1); }
+            const char_type *get_buffer() const { return reinterpret_cast<const char_type *>(this + 1); }
+            const encoding *get_encoding() const { return NULL; }
 
             void append(const string_buffer *buf)
             {
@@ -182,7 +184,7 @@ namespace koto
                 get_buffer()[this->size_] = 0;
             }
 
-            void assign(const T *str, const size_t size)
+            void assign(const char_type *str, const size_t size)
             {
                 traits_type::copy(get_buffer(), str, size);
                 this->size_ = size;
@@ -218,8 +220,8 @@ namespace koto
             return new(buf) buffer_type();
         }
 
-        T *get_buffer() { return buffer_->get_buffer(); }
-        const T *get_buffer() const { return buffer_->get_buffer(); }
+        char_type *get_buffer() { return buffer_->get_buffer(); }
+        const char_type *get_buffer() const { return buffer_->get_buffer(); }
 
         bool expand(const size_t size)
         {
@@ -285,7 +287,7 @@ namespace koto
         template<typename U>
         basic_string(
             const U &str,
-            const encoding<T> *encoding,
+            const encoding *encoding,
             typename detail::enable_if<detail::is_array<U>::value && base_type::is_dynamic_encoding>::type* = 0
         )
         : buffer_(buffer_type::create(str, encoding))
@@ -297,14 +299,14 @@ namespace koto
             const U &str,
             typename detail::enable_if<
                 !detail::is_array<U>::value &&
-                detail::is_same<typename detail::get_raw_type<U>::type, T>::value
+                detail::is_same<typename detail::get_raw_type<U>::type, char_type>::value
             >::type* = 0
         )
-        : buffer_(buffer_type::create(str, std::char_traits<T>::length(str)))
+        : buffer_(buffer_type::create(str, traits_type::length(str)))
         , has_buffer_(true)
         { }
 
-        basic_string(const T *str, const size_t len)
+        basic_string(const char_type *str, const size_t len)
         : buffer_(buffer_type::create(str, len))
         , has_buffer_(true)
         { }
@@ -316,7 +318,7 @@ namespace koto
         { }
 
         template<size_t S>
-        basic_string(const basic_fixed_string<T, E, S> &str)
+        basic_string(const basic_fixed_string<E, S> &str)
         : buffer_(buffer_type::create_from_buf(str.buffer_, str.length_, str.size_))
         , has_buffer_(true)
         { }
@@ -329,14 +331,14 @@ namespace koto
             }
         }
 
-        const T *c_str() const { return buffer_->get_buffer(); }
+        const char_type *c_str() const { return buffer_->get_buffer(); }
         size_t length() const { return buffer_->length(); }
         size_t size() const { return buffer_->size(); }
         size_t capacity() const { return buffer_->capacity(); }
-        const encoding<T> *get_encoding() const { return buffer_->get_encoding(); }
+        const encoding *get_encoding() const { return buffer_->get_encoding(); }
 
         // append
-        self_type &append(const basic_string<T, E> &str)
+        self_type &append(const basic_string<E> &str)
         {
             expand_buffer(str.size());
             buffer_->append(str.buffer_);
@@ -349,7 +351,7 @@ namespace koto
             const U &str,
             typename detail::enable_if<
                 !detail::is_array<U>::value &&
-                detail::is_same<typename detail::get_raw_type<U>::type, T>::value
+                detail::is_same<typename detail::get_raw_type<U>::type, char_type>::value
             >::type* = 0
         )
         {
@@ -371,7 +373,7 @@ namespace koto
         }
 
         template<size_t S>
-        void assign(const basic_fixed_string<T, E, S> &str)
+        void assign(const basic_fixed_string<E, S> &str)
         {
             expand_buffer(str.size());
             buffer_->assign(str.buffer_, str.size());
@@ -402,7 +404,7 @@ namespace koto
         template<typename U>
         typename detail::enable_if<
             !detail::is_array<U>::value &&
-            detail::is_same<typename detail::get_raw_type<U>::type, T>::value
+            detail::is_same<typename detail::get_raw_type<U>::type, char_type>::value
         , self_type>::type &operator=(const U &str)
         {
             assign<U>(str);
@@ -423,7 +425,7 @@ namespace koto
         }
 
         template<size_t S>
-        self_type &operator=(const basic_fixed_string<T, E, S> &str)
+        self_type &operator=(const basic_fixed_string<E, S> &str)
         {
             assign(str);
             return *this;
@@ -465,8 +467,8 @@ namespace koto
         const_iterator end() const { return cend(); }
     };
 
-    template<typename T, typename E>
-    typename basic_string<T, E>::buffer_type *basic_string<T, E>::dummy_buffer_ = basic_string<T, E>::create_dummy_buffer();
+    template<typename E>
+    typename basic_string<E>::buffer_type *basic_string<E>::dummy_buffer_ = basic_string<E>::create_dummy_buffer();
 }
 
 #endif

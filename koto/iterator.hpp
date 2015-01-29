@@ -10,25 +10,29 @@ namespace koto
 {
     namespace detail
     {
-        template<typename T, typename U, typename E>
+        template<typename T, typename E>
         class bidirectional_iterator : public std::iterator<std::bidirectional_iterator_tag, typename T::element_type>
         {
-            template<typename V, typename F>
+            template<typename F>
             friend class koto::basic_string;
 
-            template<typename V, typename W, typename F>
+            template<typename U, typename F>
             friend class bidirectional_iterator;
 
-            typedef bidirectional_iterator<T, U, E> self_type;
+            typedef bidirectional_iterator<T, E> self_type;
         private:
             T *str_;
-            U *buffer_;
+            typename detail::select_type<
+                true,
+                const typename E::char_type,
+                typename E::char_type
+            >::type *buffer_;
 
             bidirectional_iterator(T *str)
             : str_(str), buffer_(str->get_buffer())
             { }
 
-            bidirectional_iterator(T *str, U *buffer)
+            bidirectional_iterator(T *str, typename E::char_type *buffer)
             : str_(str), buffer_(buffer)
             { }
         public:
@@ -36,8 +40,8 @@ namespace koto
             : str_(it.str_), buffer_(it.buffer_)
             { }
 
-            template<typename V, typename W>
-            bidirectional_iterator(const bidirectional_iterator<V, W, E> &it)
+            template<typename U>
+            bidirectional_iterator(const bidirectional_iterator<U, E> &it)
             : str_(it.str_), buffer_(it.buffer_)
             { }
 
@@ -67,22 +71,22 @@ namespace koto
                 return i;
             }
 
-            basic_vchar_t<typename T::char_type, vchar_buffer_size, E> operator*()
+            basic_vchar_t<vchar_buffer_size, E> operator*()
             {
                 return E::template element<E>(buffer_);
             }
 
-            const basic_vchar_t<typename T::char_type, vchar_buffer_size, E> operator*() const
+            const basic_vchar_t<vchar_buffer_size, E> operator*() const
             {
                 return E::template element<E>(buffer_);
             }
 
-            basic_vchar_t<typename T::char_type, vchar_buffer_size, E> operator->()
+            basic_vchar_t<vchar_buffer_size, E> operator->()
             {
                 return E::template element<E>(buffer_);
             }
 
-            const basic_vchar_t<typename T::char_type, vchar_buffer_size, E> operator->() const
+            const basic_vchar_t<vchar_buffer_size, E> operator->() const
             {
                 return E::template element<E>(buffer_);
             }
@@ -98,28 +102,32 @@ namespace koto
             }
         };
 
-        template<typename T, typename U>
+        template<typename T>
         class bidirectional_iterator<
-            T, U, dynamic_encoding<typename T::char_type>
+            T, dynamic_encoding
         > : public std::iterator<std::bidirectional_iterator_tag, typename T::element_type>
         {
-            template<typename V, typename F>
+            template<typename F>
             friend class koto::basic_string;
 
-            template<typename V, typename W, typename F>
+            template<typename U, typename F>
             friend class bidirectional_iterator;
 
-            typedef dynamic_encoding<typename T::char_type> encoding_type;
-            typedef bidirectional_iterator<T, U, encoding_type > self_type;
+            typedef dynamic_encoding encoding_type;
+            typedef bidirectional_iterator<T, encoding_type> self_type;
         private:
             T *str_;
-            U *buffer_;
+            typename detail::select_type<
+                true,
+                const encoding_type::char_type,
+                encoding_type::char_type
+            >::type *buffer_;
 
             bidirectional_iterator(T *str)
             : str_(str), buffer_(str->get_buffer())
             { }
 
-            bidirectional_iterator(T *str, U *buffer)
+            bidirectional_iterator(T *str, encoding_type::char_type *buffer)
             : str_(str), buffer_(buffer)
             { }
         public:
@@ -127,8 +135,8 @@ namespace koto
             : str_(it.str_), buffer_(it.buffer_)
             { }
 
-            template<typename V, typename W>
-            bidirectional_iterator(const bidirectional_iterator<V, W, encoding_type > &it)
+            template<typename U>
+            bidirectional_iterator(const bidirectional_iterator<U, encoding_type> &it)
             : str_(it.str_), buffer_(it.buffer_)
             { }
 
@@ -158,22 +166,22 @@ namespace koto
                 return i;
             }
 
-            basic_vchar_t<typename T::char_type, vchar_buffer_size, encoding_type> operator*()
+            basic_vchar_t<vchar_buffer_size, encoding_type> operator*()
             {
                 return str_->get_encoding()->template element(buffer_);
             }
 
-            const basic_vchar_t<typename T::char_type, vchar_buffer_size, encoding_type> operator*() const
+            const basic_vchar_t<vchar_buffer_size, encoding_type> operator*() const
             {
                 return str_->get_encoding()->template element(buffer_);
             }
 
-            basic_vchar_t<typename T::char_type, vchar_buffer_size, encoding_type> operator->()
+            basic_vchar_t<vchar_buffer_size, encoding_type> operator->()
             {
                 return str_->get_encoding()->template element(buffer_);
             }
 
-            const basic_vchar_t<typename T::char_type, vchar_buffer_size, encoding_type> operator->() const
+            const basic_vchar_t<vchar_buffer_size, encoding_type> operator->() const
             {
                 return str_->get_encoding()->template element(buffer_);
             }

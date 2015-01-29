@@ -27,21 +27,19 @@ namespace koto
 int main(int argc, const char * argv[]) {
 #ifdef USE_DYNAMIC_ENCODING
     typedef koto::basic_string<
-        koto::default_char_type,
-        koto::dynamic_encoding<koto::default_char_type>
+        koto::dynamic_encoding
     > string;
 
     typedef koto::basic_vchar_t<
-        koto::default_char_type,
         koto::vchar_buffer_size,
-        koto::dynamic_encoding<koto::default_char_type>
+        koto::dynamic_encoding
     > vchar_t;
 #else
     using namespace koto;
 #endif
-    koto::encoding_utf8<koto::default_char_type>::dynamic_type enc;
+    // koto::encoding_utf8::dynamic_type enc;
 
-    string::set_default_encoding(&enc);
+    //string::set_default_encoding(&enc);
     string s = "こんにちは123ABCこんばんは";
 
     for(string::const_iterator it = s.begin(); it != s.end(); ++it)

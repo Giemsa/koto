@@ -9,17 +9,17 @@ namespace koto
     typedef unsigned int uint32;
     typedef unsigned short uint16;
 
-    template<typename T, size_t S, typename E>
-    class basic_vchar_t : public detail::string_base<T, E, detail::is_same<E, dynamic_encoding<T> >::value>
+    template<size_t S, typename E>
+    class basic_vchar_t : public detail::string_base<E, detail::is_same<E, dynamic_encoding>::value>
     {
-        template<typename U, size_t N, typename F>
-        friend std::ostream &operator<<(std::ostream& stream, const basic_vchar_t<U, N, F>& c);
+        template<size_t N, typename F>
+        friend std::ostream &operator<<(std::ostream& stream, const basic_vchar_t<N, F>& c);
 
-        template<typename U, size_t N, typename F>
-        friend std::istream &operator>>(std::istream& stream, const basic_vchar_t<U, N, F>& c);
+        template<size_t N, typename F>
+        friend std::istream &operator>>(std::istream& stream, const basic_vchar_t<N, F>& c);
 
-        typedef detail::string_base<T, E, detail::is_same<E, dynamic_encoding<T> >::value> base_type;
-        typedef basic_vchar_t<T, S, E> self_type;
+        typedef detail::string_base<E, detail::is_same<E, dynamic_encoding>::value> base_type;
+        typedef basic_vchar_t<S, E> self_type;
         typedef E encoding_type;
 
         struct value_types
@@ -33,7 +33,7 @@ namespace koto
 
         class vchar_base
         {
-            template<typename U, size_t N, typename F>
+            template<size_t N, typename F>
             friend class basic_vchar_t;
         protected:
             value_type value_type_;
@@ -91,12 +91,12 @@ namespace koto
 
         class vchar : public vchar_base
         {
-            template<typename U, size_t N, typename F>
+            template<size_t N, typename F>
             friend class basic_vchar_t;
 
             typedef vchar_base base;
         public:
-            vchar(const char *str, const size_t size, const encoding<T> *enc)
+            vchar(const char *str, const size_t size, const encoding *enc)
             : base(value_types::char_value)
             {
                 if(E::length(str, size) != 1)
@@ -107,21 +107,21 @@ namespace koto
                 base::write(str, size);
             }
 
-            vchar(const wchar_t *str, const size_t size, const encoding<T> *enc)
+            vchar(const wchar_t *str, const size_t size, const encoding *enc)
             : base(value_types::u32_value)
             {
                 throw not_implemented();
                 base::write(str, size);
             }
 
-            vchar(const uint16 *str, const size_t size, const encoding<T> *enc)
+            vchar(const uint16 *str, const size_t size, const encoding *enc)
             : base(value_types::u16_value)
             {
                 throw not_implemented();
                 base::write(str, size);
             }
 
-            vchar(const uint32 *str, const size_t size, const encoding<T> *enc)
+            vchar(const uint32 *str, const size_t size, const encoding *enc)
             : base(value_types::u32_value)
             {
                 throw not_implemented();
@@ -131,38 +131,38 @@ namespace koto
 
         class vchar_with_encoding : public vchar_base
         {
-            template<typename U, size_t N, typename F>
+            template<size_t N, typename F>
             friend class basic_vchar_t;
 
             typedef vchar_base base;
         private:
-            const encoding<T> *encoding_;
+            const encoding *encoding_;
         public:
-            vchar_with_encoding(const char *str, const size_t size, const encoding<T> *enc)
+            vchar_with_encoding(const char *str, const size_t size, const encoding *enc)
             : base(value_types::char_value)
             {
                 base::write(str, size);
             }
 
-            vchar_with_encoding(const wchar_t *str, const size_t size, const encoding<T> *enc)
+            vchar_with_encoding(const wchar_t *str, const size_t size, const encoding *enc)
             : base(value_types::u32_value)
             {
                 base::write(str, size);
             }
 
-            vchar_with_encoding(const uint16 *str, const size_t size, const encoding<T> *enc)
+            vchar_with_encoding(const uint16 *str, const size_t size, const encoding *enc)
             : base(value_types::u16_value)
             {
                 base::write(str, size);
             }
 
-            vchar_with_encoding(const uint32 *str, const size_t size, const encoding<T> *enc)
+            vchar_with_encoding(const uint32 *str, const size_t size, const encoding *enc)
             : base(value_types::u32_value)
             {
                 base::write(str, size);
             }
 
-            void set_encoding(const encoding<T> *enc)
+            void set_encoding(const encoding *enc)
             {
                 encoding_ = enc;
             }
@@ -179,11 +179,11 @@ namespace koto
         void input(std::istream &stream) { value_.input(stream); }
         void output(std::ostream &stream) const { value_.output(stream); }
     public:
-        basic_vchar_t(const char *str, const size_t size, const encoding<T> *enc = base_type::default_encoding_)
+        basic_vchar_t(const char *str, const size_t size, const encoding *enc = base_type::default_encoding_)
         : value_(str, size, enc)
         { }
 
-        basic_vchar_t(const char *str, const encoding<T> *enc = base_type::default_encoding_)
+        basic_vchar_t(const char *str, const encoding *enc = base_type::default_encoding_)
         : value_(str, std::char_traits<char>::length(str), enc)
         { }
 
@@ -204,7 +204,7 @@ namespace koto
         }
 
         template<bool C = base_type::is_dynamic_encoding>
-        self_type &with(const encoding<T> *enc, const typename detail::enable_if<C>::type* = 0)
+        self_type &with(const encoding *enc, const typename detail::enable_if<C>::type* = 0)
         {
             value_.set_encoding(enc);
             return *this;
@@ -213,18 +213,18 @@ namespace koto
         const char *c_str() const { return value_.c_str(); }
     };
 
-    typedef basic_vchar_t<default_char_type, 4, encoding_utf8<default_char_type> > vchar_t;
+    typedef basic_vchar_t<4, encoding_utf8> vchar_t;
 
     // overload
-    template<typename T, size_t S, typename E>
-    std::ostream &operator<<(std::ostream& stream, const basic_vchar_t<T, S, E>& c)
+    template<size_t S, typename E>
+    std::ostream &operator<<(std::ostream& stream, const basic_vchar_t<S, E>& c)
     {
         c.output(stream);
         return stream;
     }
 
-    template<typename T, size_t S, typename E>
-    std::istream &operator>>(std::istream& stream, basic_vchar_t<T, S, E>& c)
+    template<size_t S, typename E>
+    std::istream &operator>>(std::istream& stream, basic_vchar_t<S, E>& c)
     {
         c.input(stream);
         return stream;
