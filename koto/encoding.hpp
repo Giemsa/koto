@@ -19,8 +19,11 @@ namespace koto
         virtual size_t length(const char *str, const size_t len) const = 0;
         virtual element_type element(const char *str, const size_t index) const = 0;
         virtual element_type element(const char *str) const = 0;
+        virtual void advance(char *&str, const size_t n) const = 0;
         virtual void advance(const char *&str, const size_t n) const = 0;
+        virtual void next(char *&str) const = 0;
         virtual void next(const char *&str) const = 0;
+        virtual void prev(char *&str) const = 0;
         virtual void prev(const char *&str) const = 0;
 
         virtual bool accept_write_element() const = 0;
@@ -57,14 +60,29 @@ namespace koto
                 return E::template element<dynamic_encoding>(str).with(this);
             }
 
+            void advance(char *&str, const size_t n) const // override
+            {
+                return E::advance(str, n);
+            }
+
             void advance(const char *&str, const size_t n) const // override
             {
                 return E::advance(str, n);
             }
 
+            void next(char *&str) const // override
+            {
+                return E::next(str);
+            }
+
             void next(const char *&str) const // override
             {
                 return E::next(str);
+            }
+
+            void prev(char *&str) const // override
+            {
+                return E::prev(str);
             }
 
             void prev(const char *&str) const // override
@@ -73,6 +91,18 @@ namespace koto
             }
 
             bool accept_write_element() const { return E::accept_write_element; } // override
+        };
+    protected:
+        template<typename T>
+        struct valid
+        {
+            typedef typename detail::enable_if<
+                detail::is_same<
+                    typename detail::get_raw_type<T>::type,
+                    typename E::char_type
+                >::value,
+                T
+            >::type type;
         };
     public:
         typedef encoding_wrapper dynamic_type;
@@ -112,9 +142,12 @@ namespace koto
             return basic_vchar_t<vchar_buffer_size, E>(f, str - f);
         }
 
-        static void advance(const char_type *&str, const size_t n) { utf8::unchecked::advance(str, n); }
-        static void next(const char_type *&str) { utf8::unchecked::next(str); }
-        static void prev(const char_type *&str) { utf8::unchecked::previous(str); }
+        template<typename T>
+        static void advance(T *&str, const size_t n) { utf8::unchecked::advance(str, n); }
+        template<typename T>
+        static void next(T *&str) { utf8::unchecked::next(str); }
+        template<typename T>
+        static void prev(T *&str) { utf8::unchecked::previous(str); }
     };
 
     /* ascii */
@@ -142,9 +175,12 @@ namespace koto
             return basic_vchar_t<vchar_buffer_size, E>(str, 1);
         }
 
-        static void advance(const char_type *&str, const size_t n) { str += n; }
-        static void next(const char_type *&str) { ++str; }
-        static void prev(const char_type *&str) { --str; }
+        template<typename T>
+        static void advance(T *&str, const size_t n) { str += n; }
+        template<typename T>
+        static void next(T *&str) { ++str; }
+        template<typename T>
+        static void prev(T *&str) { --str; }
     };
 }
 

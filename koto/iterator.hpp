@@ -23,7 +23,7 @@ namespace koto
         private:
             T *str_;
             typename detail::select_type<
-                true,
+                detail::is_const<T>::value,
                 const typename E::char_type,
                 typename E::char_type
             >::type *buffer_;
@@ -118,7 +118,7 @@ namespace koto
         private:
             T *str_;
             typename detail::select_type<
-                true,
+                detail::is_const<T>::value,
                 const encoding_type::char_type,
                 encoding_type::char_type
             >::type *buffer_;
