@@ -10,6 +10,7 @@
 #include "ref.hpp"
 #include "config.hpp"
 #include "forward.hpp"
+#include "utils.hpp"
 #include "exception.hpp"
 #include "string_base.hpp"
 #include "vchar.hpp"

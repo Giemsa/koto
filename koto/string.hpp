@@ -97,11 +97,40 @@ namespace koto
             const char_type *get_buffer() const { return reinterpret_cast<const char_type *>(this + 1); }
             const encoding *get_encoding() const { return encoding_; }
 
-            void append(const char_type *str, const size_t len)
+            void append(const string_buffer_with_encoding *buf)
             {
-                traits_type::copy(get_buffer() + this->length_, str, len);
-                this->length_ += len;
-                get_buffer()[this->length_] = 0;
+                traits_type::copy(get_buffer() + this->size_, buf->get_buffer(), buf->size_);
+                this->size_ += buf->size_;
+                this->length_ += buf->length_;
+                get_buffer()[this->size_] = 0;
+            }
+
+            void append(const char_type c)
+            {
+                traits_type::copy(get_buffer() + this->size_, &c, sizeof(char_type));
+                this->size_ += sizeof(char_type);
+                this->length_ += sizeof(char_type);
+                get_buffer()[this->size_] = 0;
+            }
+
+            void append(const char_type *v, const size_t size)
+            {
+                traits_type::copy(get_buffer() + this->size_, v, size);
+                this->size_ += size;
+                this->length_ += encoding_->length(v, size);
+                get_buffer()[this->size_] = 0;
+            }
+
+            template<typename U>
+            void append(const U &v)
+            {
+                char_type buf[std::numeric_limits<U>::digits10 + 2];
+                const char *e = util::to_string(buf, sizeof(buf), v);
+                const size_t l = sizeof(buf) - (e - buf);
+                traits_type::copy(get_buffer() + this->size_, e, l);
+                this->size_ += l;
+                this->length_ += l;
+                get_buffer()[this->size_] = 0;
             }
 
             void assign(const char_type *str, const size_t size)
@@ -200,6 +229,34 @@ namespace koto
                 get_buffer()[this->size_] = 0;
             }
 
+            void append(const char_type c)
+            {
+                traits_type::copy(get_buffer() + this->size_, &c, sizeof(char_type));
+                this->size_ += sizeof(char_type);
+                this->length_ += sizeof(char_type);
+                get_buffer()[this->size_] = 0;
+            }
+
+            void append(const char_type *v, const size_t size)
+            {
+                traits_type::copy(get_buffer() + this->size_, v, size);
+                this->size_ += size;
+                this->length_ += encoding_type::length(v, size);
+                get_buffer()[this->size_] = 0;
+            }
+
+            template<typename U>
+            void append(const U &v)
+            {
+                char_type buf[std::numeric_limits<U>::digits10 + 2];
+                const char *e = util::to_string(buf, sizeof(buf), v);
+                const size_t l = sizeof(buf) - (e - buf);
+                traits_type::copy(get_buffer() + this->size_, e, l);
+                this->size_ += l;
+                this->length_ += l;
+                get_buffer()[this->size_] = 0;
+            }
+
             void assign(const char_type *str, const size_t size)
             {
                 traits_type::copy(get_buffer(), str, size);
@@ -267,6 +324,14 @@ namespace koto
             buffer_type::destroy(buffer_);
 
             buffer_ = str.buffer_->copy();
+        }
+
+        template<typename U>
+        self_type &_append(const U &v)
+        {
+            expand_buffer(sizeof(U));
+            buffer_->append(v);
+            return *this;
         }
 
     public:
@@ -343,6 +408,34 @@ namespace koto
             return *this;
         }
 
+        self_type &append(const char_type *v, const size_t size)
+        {
+            expand_buffer(size);
+            buffer_->append(v, size);
+            return *this;
+        }
+
+        self_type &append(const char_type *v) { return append(v, traits_type::length(v)); }
+
+        self_type &append(const char_type v)
+        {
+            expand_buffer(sizeof(char_type));
+            buffer_->append(v);
+            return *this;
+        }
+
+        self_type &append(const short v)              { return _append(v); }
+        self_type &append(const unsigned short v)     { return _append(v); }
+        self_type &append(const int v)                { return _append(v); }
+        self_type &append(const unsigned int v)       { return _append(v); }
+        self_type &append(const long v)               { return _append(v); }
+        self_type &append(const unsigned long v)      { return _append(v); }
+
+        /*
+        self_type &append(const long long v)          { return _append(v); }
+        self_type &append(const unsigned long long v) { return _append(v); }
+        */
+
         // assign
         template<typename U>
         void assign(
@@ -377,6 +470,7 @@ namespace koto
             buffer_->assign(str.buffer_, str.size());
         }
 
+        // at
         template<bool C = encoding_type::accept_write_element>
         typename detail::enable_if<C, element_type>::type at(const size_t index)
         {

@@ -24,6 +24,7 @@
 
 /* Begin PBXFileReference section */
 		3003CE6B1A7A87DD00CE3B10 /* stringbuilder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = stringbuilder.h; sourceTree = "<group>"; };
+		3003CE6C1A7A8FA300CE3B10 /* utils.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = utils.hpp; sourceTree = "<group>"; };
 		308B46211A641AC80002F447 /* koto */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = koto; sourceTree = BUILT_PRODUCTS_DIR; };
 		308B46241A641AC80002F447 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = ../sample/osx/koto/koto/main.cpp; sourceTree = "<group>"; };
 		308B462C1A641AE30002F447 /* allocator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = allocator.hpp; sourceTree = "<group>"; };
@@ -95,6 +96,7 @@
 				30A1444D1A6BAFA600E617AD /* iterator.hpp */,
 				308B46241A641AC80002F447 /* main.cpp */,
 				3003CE6B1A7A87DD00CE3B10 /* stringbuilder.h */,
+				3003CE6C1A7A8FA300CE3B10 /* utils.hpp */,
 			);
 			name = koto;
 			path = ../../../koto;
