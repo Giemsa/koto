@@ -24,9 +24,9 @@ namespace koto
 
         struct value_types
         {
-            static const char char_value = 0;
-            static const char u16_value  = 1;
-            static const char u32_value  = 2;
+            static const unsigned char char_value = 0;
+            static const unsigned char u16_value  = 1;
+            static const unsigned char u32_value  = 2;
         };
 
         typedef unsigned char value_type;
@@ -37,7 +37,7 @@ namespace koto
             friend class basic_vchar_t;
         protected:
             value_type value_type_;
-            char char_buf_[S + 1];
+            char char_buf_[S];
 
             template<typename U>
             void write(const U *str, const size_t size)
@@ -75,7 +75,10 @@ namespace koto
                 switch(value_type_)
                 {
                     case value_types::char_value:
-                        stream << char_buf_;
+                        for(int i = 0; i < S && char_buf_[i]; ++i)
+                        {
+                            stream.put(char_buf_[i]);
+                        }
                         break;
                     case value_types::u16_value:
                         throw not_implemented();
@@ -213,7 +216,7 @@ namespace koto
         const char *c_str() const { return value_.c_str(); }
     };
 
-    typedef basic_vchar_t<4, encoding_utf8> vchar_t;
+    typedef basic_vchar_t<vchar_buffer_size, encoding_utf8> vchar_t;
 
     // overload
     template<size_t S, typename E>
