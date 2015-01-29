@@ -19,7 +19,7 @@ namespace koto
         friend class basic_fixed_string;
 
         template<typename V, typename F>
-        friend class detail::bidirectional_iterator;
+        friend class detail::iterator;
 
         typedef basic_string<E> self_type;
         typedef E encoding_type;
@@ -27,8 +27,8 @@ namespace koto
         typedef detail::string_base<E, detail::is_same<E, dynamic_encoding>::value> base_type;
     public:
         typedef basic_vchar_t<vchar_buffer_size, E> element_type;
-        typedef detail::bidirectional_iterator<self_type, E> iterator;
-        typedef detail::bidirectional_iterator<const self_type, E> const_iterator;
+        typedef detail::iterator<self_type, E> iterator;
+        typedef detail::iterator<const self_type, E> const_iterator;
 
     private:
         class string_buffer_base

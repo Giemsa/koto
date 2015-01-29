@@ -11,15 +11,15 @@ namespace koto
     namespace detail
     {
         template<typename T, typename E>
-        class bidirectional_iterator : public std::iterator<std::bidirectional_iterator_tag, typename T::element_type>
+        class iterator : public std::iterator<std::bidirectional_iterator_tag, typename T::element_type>
         {
             template<typename F>
             friend class koto::basic_string;
 
             template<typename U, typename F>
-            friend class bidirectional_iterator;
+            friend class iterator;
 
-            typedef bidirectional_iterator<T, E> self_type;
+            typedef iterator<T, E> self_type;
         private:
             T *str_;
             typename detail::select_type<
@@ -28,20 +28,20 @@ namespace koto
                 typename E::char_type
             >::type *buffer_;
 
-            bidirectional_iterator(T *str)
+            iterator(T *str)
             : str_(str), buffer_(str->get_buffer())
             { }
 
-            bidirectional_iterator(T *str, typename E::char_type *buffer)
+            iterator(T *str, typename E::char_type *buffer)
             : str_(str), buffer_(buffer)
             { }
         public:
-            bidirectional_iterator(const self_type &it)
+            iterator(const self_type &it)
             : str_(it.str_), buffer_(it.buffer_)
             { }
 
             template<typename U>
-            bidirectional_iterator(const bidirectional_iterator<U, E> &it)
+            iterator(const iterator<U, E> &it)
             : str_(it.str_), buffer_(it.buffer_)
             { }
 
@@ -103,7 +103,7 @@ namespace koto
         };
 
         template<typename T>
-        class bidirectional_iterator<
+        class iterator<
             T, dynamic_encoding
         > : public std::iterator<std::bidirectional_iterator_tag, typename T::element_type>
         {
@@ -111,10 +111,10 @@ namespace koto
             friend class koto::basic_string;
 
             template<typename U, typename F>
-            friend class bidirectional_iterator;
+            friend class iterator;
 
             typedef dynamic_encoding encoding_type;
-            typedef bidirectional_iterator<T, encoding_type> self_type;
+            typedef iterator<T, encoding_type> self_type;
         private:
             T *str_;
             typename detail::select_type<
@@ -123,20 +123,20 @@ namespace koto
                 encoding_type::char_type
             >::type *buffer_;
 
-            bidirectional_iterator(T *str)
+            iterator(T *str)
             : str_(str), buffer_(str->get_buffer())
             { }
 
-            bidirectional_iterator(T *str, encoding_type::char_type *buffer)
+            iterator(T *str, encoding_type::char_type *buffer)
             : str_(str), buffer_(buffer)
             { }
         public:
-            bidirectional_iterator(const self_type &it)
+            iterator(const self_type &it)
             : str_(it.str_), buffer_(it.buffer_)
             { }
 
             template<typename U>
-            bidirectional_iterator(const bidirectional_iterator<U, encoding_type> &it)
+            iterator(const iterator<U, encoding_type> &it)
             : str_(it.str_), buffer_(it.buffer_)
             { }
 
