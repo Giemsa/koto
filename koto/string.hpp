@@ -255,7 +255,7 @@ namespace koto
         void expand_buffer(const size_t size)
         {
             const size_t s = buffer_->length() + size;
-            if(s >= buffer_->capacity() || buffer_->own())
+            if(s >= buffer_->capacity() || !buffer_->own())
             {
                 // TODO: いい感じにサイズ増やす
                 expand(s);
