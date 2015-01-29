@@ -18,6 +18,7 @@
 #include "string.hpp"
 #include "fixed_string.hpp"
 #include "string_base_impl.hpp"
+#include "stringbuilder.h"
 
 namespace koto
 {
