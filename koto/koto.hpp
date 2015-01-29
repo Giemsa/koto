@@ -7,6 +7,7 @@
 #include <limits>
 #include "type_traits.hpp"
 #include "allocator.hpp"
+#include "ref.hpp"
 #include "config.hpp"
 #include "forward.hpp"
 #include "exception.hpp"

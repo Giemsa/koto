@@ -42,6 +42,7 @@
 		30A1444D1A6BAFA600E617AD /* iterator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = iterator.hpp; sourceTree = "<group>"; };
 		30A7B0FE1A6552D1001F2121 /* exception.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = exception.hpp; sourceTree = "<group>"; };
 		7A37CFF71A67E3E100DD60E4 /* string_base.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = string_base.hpp; sourceTree = "<group>"; };
+		7A7EAF5B1A7A2BC9005E6321 /* ref.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ref.hpp; sourceTree = "<group>"; };
 		7AD127451A7A1566008F4AFB /* string_base_impl.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = string_base_impl.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -77,6 +78,7 @@
 			children = (
 				308B462C1A641AE30002F447 /* allocator.hpp */,
 				308B462D1A641AE30002F447 /* config.hpp */,
+				7A7EAF5B1A7A2BC9005E6321 /* ref.hpp */,
 				308B462E1A641AE30002F447 /* forward.hpp */,
 				308B462F1A641AE30002F447 /* encoding.hpp */,
 				308B46301A641AE30002F447 /* fixed_string.hpp */,

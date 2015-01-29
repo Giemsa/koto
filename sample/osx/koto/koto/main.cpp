@@ -1,6 +1,6 @@
 #include <iostream>
 
-#define USE_DYNAMIC_ENCODING
+// #define USE_DYNAMIC_ENCODING
 
 /* install custom default allocator */
 /*
@@ -40,7 +40,11 @@ int main(int argc, const char * argv[]) {
     // koto::encoding_utf8::dynamic_type enc;
 
     //string::set_default_encoding(&enc);
-    string s = "こんにちは123ABCこんばんは";
+    string s;
+    {
+        string t = "こんにちは123ABCこんばんは";
+        s = t;
+    }
 
     for(string::const_iterator it = s.begin(); it != s.end(); ++it)
     {

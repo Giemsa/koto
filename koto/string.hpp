@@ -37,14 +37,18 @@ namespace koto
             size_t length_;   // string length
             size_t size_;     // byte size
             size_t capacity_;
+            detail::counter ref_; // reference counting
         public:
             string_buffer_base(const size_t length, const size_t size, const size_t capacity)
-            : length_(length), size_(size), capacity_(capacity)
+            : length_(length), size_(size), capacity_(capacity), ref_(1)
             { }
 
             size_t length() const { return length_; }
             size_t size() const { return size_; }
             size_t capacity() const { return capacity_; }
+
+            size_t unref() { return --ref_; }
+            bool own() const { return ref_ == 1; }
         };
 
         class string_buffer_with_encoding : public string_buffer_base
@@ -82,8 +86,11 @@ namespace koto
 
             static void destroy(string_buffer_with_encoding *p)
             {
-                p->~string_buffer_with_encoding();
-                allocator::deallocate(p);
+                if(p != dummy_buffer_ && p->unref() == 0)
+                {
+                    p->~string_buffer_with_encoding();
+                    allocator::deallocate(p);
+                }
             }
 
             char_type *get_buffer() { return reinterpret_cast<char_type *>(this + 1); }
@@ -113,6 +120,12 @@ namespace koto
             const element_type element(const size_t index) const
             {
                 return encoding_->element(get_buffer(), index);
+            }
+
+            string_buffer_with_encoding *copy()
+            {
+                ++this->ref_;
+                return this;
             }
         };
 
@@ -168,8 +181,11 @@ namespace koto
 
             static void destroy(string_buffer *p)
             {
-                p->~string_buffer();
-                allocator::deallocate(p);
+                if(p != dummy_buffer_ && p->unref() == 0)
+                {
+                    p->~string_buffer();
+                    allocator::deallocate(p);
+                }
             }
 
             char_type *get_buffer() { return reinterpret_cast<char_type *>(this + 1); }
@@ -202,6 +218,12 @@ namespace koto
             {
                 return encoding_type::element(get_buffer(), index);
             }
+
+            string_buffer *copy()
+            {
+                ++this->ref_;
+                return this;
+            }
         };
 
         typedef typename detail::select_type<
@@ -212,7 +234,6 @@ namespace koto
     private:
         static buffer_type *dummy_buffer_;
         buffer_type *buffer_;
-        bool has_buffer_;
 
         static buffer_type *create_dummy_buffer()
         {
@@ -226,15 +247,7 @@ namespace koto
         bool expand(const size_t size)
         {
             buffer_type *buf = buffer_type::create(buffer_->get_buffer(), buffer_->size(), size, this->default_encoding_);
-            if(has_buffer_)
-            {
-                buffer_type::destroy(buffer_);
-            }
-            else
-            {
-                has_buffer_ = true;
-            }
-
+            buffer_type::destroy(buffer_);
             buffer_ = buf;
             return buf;
         }
@@ -242,7 +255,7 @@ namespace koto
         void expand_buffer(const size_t size)
         {
             const size_t s = buffer_->length() + size;
-            if(s >= buffer_->capacity() || !has_buffer_)
+            if(s >= buffer_->capacity() || buffer_->own())
             {
                 // TODO: いい感じにサイズ増やす
                 expand(s);
@@ -251,19 +264,14 @@ namespace koto
 
         void replace_buffer(const self_type &str)
         {
-            if(has_buffer_)
-            {
-                buffer_type::destroy(buffer_);
-            }
+            buffer_type::destroy(buffer_);
 
-            buffer_ = str.buffer_;
-            has_buffer_ = false;
+            buffer_ = str.buffer_->copy();
         }
 
     public:
         basic_string()
         : buffer_(dummy_buffer_)
-        , has_buffer_(false)
         { }
 
         template<typename U>
@@ -272,7 +280,6 @@ namespace koto
             typename detail::enable_if<detail::is_array<U>::value && !base_type::is_dynamic_encoding>::type* = 0
         )
         : buffer_(buffer_type::create_from_buf(str))
-        , has_buffer_(true)
         { }
 
         template<typename U>
@@ -281,7 +288,6 @@ namespace koto
             typename detail::enable_if<detail::is_array<U>::value && base_type::is_dynamic_encoding>::type* = 0
         )
         : buffer_(buffer_type::create(str, this->default_encoding_))
-        , has_buffer_(true)
         { }
 
         template<typename U>
@@ -291,7 +297,6 @@ namespace koto
             typename detail::enable_if<detail::is_array<U>::value && base_type::is_dynamic_encoding>::type* = 0
         )
         : buffer_(buffer_type::create(str, encoding))
-        , has_buffer_(true)
         { }
 
         template<typename U>
@@ -303,32 +308,25 @@ namespace koto
             >::type* = 0
         )
         : buffer_(buffer_type::create(str, traits_type::length(str)))
-        , has_buffer_(true)
         { }
 
         basic_string(const char_type *str, const size_t len)
         : buffer_(buffer_type::create(str, len))
-        , has_buffer_(true)
-        { }
-
-        // CoW
-        basic_string(const basic_string &rhs)
-        : buffer_(rhs.buffer_)
-        , has_buffer_(false)
         { }
 
         template<size_t S>
         basic_string(const basic_fixed_string<E, S> &str)
         : buffer_(buffer_type::create_from_buf(str.buffer_, str.length_, str.size_))
-        , has_buffer_(true)
+        { }
+
+        // CoW
+        basic_string(const basic_string &rhs)
+        : buffer_(rhs.buffer_->copy())
         { }
 
         ~basic_string()
         {
-            if(has_buffer_)
-            {
-                buffer_type::destroy(buffer_);
-            }
+            buffer_type::destroy(buffer_);
         }
 
         const char_type *c_str() const { return buffer_->get_buffer(); }
