@@ -92,18 +92,6 @@ namespace koto
 
             bool accept_write_element() const { return E::accept_write_element; } // override
         };
-    protected:
-        template<typename T>
-        struct valid
-        {
-            typedef typename detail::enable_if<
-                detail::is_same<
-                    typename detail::get_raw_type<T>::type,
-                    typename E::char_type
-                >::value,
-                T
-            >::type type;
-        };
     public:
         typedef encoding_wrapper dynamic_type;
         typedef E static_type;

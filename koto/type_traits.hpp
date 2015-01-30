@@ -100,8 +100,13 @@ namespace koto
 
         template<typename T>
         struct is_const<T const> : public true_type { };
-    }
 
+        template<typename T>
+        struct is_unsigned
+        {
+            static const bool value = T(0) < T(-1);
+        };
+    }
 }
 
 #endif
