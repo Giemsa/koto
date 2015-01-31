@@ -46,7 +46,7 @@ int main(int argc, const char * argv[]) {
         s = t;
     }
 
-    s.append(-100);
+    s.append(2355948379894859379834789375498379623.0);
     s.append("かきくけこ");
 
     for(string::const_iterator it = s.begin(); it != s.end(); ++it)

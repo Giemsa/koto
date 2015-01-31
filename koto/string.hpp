@@ -124,9 +124,9 @@ namespace koto
             template<typename U>
             void append(const U &v)
             {
-                char_type buf[std::numeric_limits<U>::digits10 + 2];
+                char_type buf[detail::type_cast_info<U>::bufsize + 1];
                 const char *e = util::to_string(buf, sizeof(buf), v);
-                const size_t l = sizeof(buf) - (e - buf);
+                const size_t l = sizeof(buf) - 1 - (e - buf);
                 traits_type::copy(get_buffer() + this->size_, e, l);
                 this->size_ += l;
                 this->length_ += l;
@@ -248,7 +248,7 @@ namespace koto
             template<typename U>
             void append(const U &v)
             {
-                char_type buf[std::numeric_limits<U>::digits10 + 2];
+                char_type buf[detail::type_cast_info<U>::bufsize + 1];
                 const char *e = util::to_string(buf, sizeof(buf), v);
                 const size_t l = sizeof(buf) - (e - buf);
                 traits_type::copy(get_buffer() + this->size_, e, l);
@@ -311,7 +311,7 @@ namespace koto
 
         void expand_buffer(const size_t size)
         {
-            const size_t s = buffer_->length() + size;
+            const size_t s = buffer_->size() + size;
             if(s >= buffer_->capacity() || !buffer_->own())
             {
                 // TODO: いい感じにサイズ増やす
@@ -329,7 +329,7 @@ namespace koto
         template<typename U>
         self_type &_append(const U &v)
         {
-            expand_buffer(sizeof(U));
+            expand_buffer(detail::type_cast_info<U>::bufsize + 1);
             buffer_->append(v);
             return *this;
         }
@@ -431,6 +431,8 @@ namespace koto
         self_type &append(const long v)               { return _append(v); }
         self_type &append(const unsigned long v)      { return _append(v); }
 
+        self_type &append(const float v)              { return _append(v); }
+        self_type &append(const double v)             { return _append(v); }
         /*
         self_type &append(const long long v)          { return _append(v); }
         self_type &append(const unsigned long long v) { return _append(v); }

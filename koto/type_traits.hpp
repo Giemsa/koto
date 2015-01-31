@@ -106,6 +106,15 @@ namespace koto
         {
             static const bool value = T(0) < T(-1);
         };
+
+        template<typename T>
+        struct is_floating_point
+        {
+            static const bool value =
+                detail::is_same<float, typename detail::remove_cv<T>::type>::value ||
+                detail::is_same<double, typename detail::remove_cv<T>::type>::value ||
+                detail::is_same<long double, typename detail::remove_cv<T>::type>::value;
+        };
     }
 }
 
