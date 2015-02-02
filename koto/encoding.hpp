@@ -5,6 +5,7 @@
 #define MW_KOTO_ENCODING_HPP
 
 #include "utf8.h"
+#include "utf16.hpp"
 
 namespace koto
 {
@@ -137,6 +138,57 @@ namespace koto
         template<typename T>
         static void prev(T *&str) { utf8::unchecked::previous(str); }
     };
+
+    /* utf 16 */
+    namespace detail
+    {
+        template<typename T, typename E>
+        class encoding_utf16_base : public static_encoding<E>
+        {
+        public:
+            typedef char16_t char_type;
+            static const bool accept_write_element = false;
+        private:
+        public:
+            encoding_utf16_base() { }
+            ~encoding_utf16_base() { }
+
+            static size_t length(const char_type *str, const size_t len)
+            {
+                return utf16::length<E>(str, str + len);
+            }
+
+            template<typename F>
+            static basic_vchar_t<vchar_buffer_size, F> element(const char_type *str, const size_t index)
+            {
+                utf8::unchecked::advance(str, index);
+                const char_type *f = str;
+                utf8::unchecked::next(str);
+                return basic_vchar_t<vchar_buffer_size, F>(f, str - f);
+            }
+
+            template<typename F>
+            static basic_vchar_t<vchar_buffer_size, F> element(const char_type *str)
+            {
+                const char_type *f = str;
+                utf8::unchecked::next(str);
+                return basic_vchar_t<vchar_buffer_size, F>(f, str - f);
+            }
+
+            template<typename U>
+            static void advance(U *&str, const size_t n) { utf8::unchecked::advance(str, n); }
+            template<typename U>
+            static void next(U *&str) { utf8::unchecked::next(str); }
+            template<typename U>
+            static void prev(U *&str) { utf8::unchecked::previous(str); }
+        };
+    }
+
+    class encoding_utf16LE /* final */
+        : public detail::encoding_utf16_base<encoding_utf16LE, utf16::utf16le_t> { };
+
+    class encoding_utf16BE /* final */
+        : public detail::encoding_utf16_base<encoding_utf16BE, utf16::utf16be_t> { };
 
     /* ascii */
     class encoding_ascii /* final */ : public static_encoding<encoding_ascii>

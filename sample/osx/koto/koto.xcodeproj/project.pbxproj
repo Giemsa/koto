@@ -45,6 +45,7 @@
 		30A7B0FE1A6552D1001F2121 /* exception.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = exception.hpp; sourceTree = "<group>"; };
 		7A37CFF71A67E3E100DD60E4 /* string_base.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = string_base.hpp; sourceTree = "<group>"; };
 		7A7EAF5B1A7A2BC9005E6321 /* ref.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ref.hpp; sourceTree = "<group>"; };
+		7AC19A641A7F830C00BF9968 /* utf16.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = utf16.hpp; path = utf16/utf16.hpp; sourceTree = "<group>"; };
 		7AD127451A7A1566008F4AFB /* string_base_impl.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = string_base_impl.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -78,6 +79,7 @@
 		308B462B1A641AE30002F447 /* koto */ = {
 			isa = PBXGroup;
 			children = (
+				7AC19A631A7F82FD00BF9968 /* utf16 */,
 				308B462C1A641AE30002F447 /* allocator.hpp */,
 				308B462D1A641AE30002F447 /* config.hpp */,
 				7A7EAF5B1A7A2BC9005E6321 /* ref.hpp */,
@@ -119,6 +121,14 @@
 				308B46381A641AE30002F447 /* unchecked.h */,
 			);
 			path = utf8;
+			sourceTree = "<group>";
+		};
+		7AC19A631A7F82FD00BF9968 /* utf16 */ = {
+			isa = PBXGroup;
+			children = (
+				7AC19A641A7F830C00BF9968 /* utf16.hpp */,
+			);
+			name = utf16;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -261,6 +271,7 @@
 		308B46291A641AC80002F447 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -268,6 +279,7 @@
 		308B462A1A641AC80002F447 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

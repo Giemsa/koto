@@ -40,6 +40,7 @@ int main(int argc, const char * argv[]) {
     // koto::encoding_utf8::dynamic_type enc;
 
     //string::set_default_encoding(&enc);
+    /*
     string s;
     {
         string t = "こんにちは123ABCこんばんは";
@@ -56,6 +57,16 @@ int main(int argc, const char * argv[]) {
 
     std::cout << "\n";
     std::cout << s.length() << std::endl;
+    */
+
+    char16_t bs[] = {
+        0x3042, 0xD842, 0xDFB7, 0x0000
+        //0x4230, 0x42DB, 0xB7DF, 0x0000
+    };
+
+    koto::basic_string<koto::encoding_utf16BE> str = bs;
+
+    std::cout << str.length() << std::endl;
 
     return 0;
 }

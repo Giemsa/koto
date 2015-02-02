@@ -26,6 +26,11 @@
 namespace koto
 {
     static const int vchar_buffer_size = 4;
+
+#if __cplusplus <= 199711L
+    typedef unsigned short char16_t;
+    typedef unsigned int char32_t;
+#endif
 }
 
 #endif
