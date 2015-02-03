@@ -268,12 +268,12 @@ namespace koto
             template<bool C = encoding_type::accept_write_element>
             element_type element(const size_t index, const typename detail::enable_if<C>::type* = 0)
             {
-                return encoding_type::element(get_buffer(), index);
+                return encoding_type::template element<E>(get_buffer(), index);
             }
 
             const element_type element(const size_t index) const
             {
-                return encoding_type::element(get_buffer(), index);
+                return encoding_type::template element<E>(get_buffer(), index, this);
             }
 
             string_buffer *copy()

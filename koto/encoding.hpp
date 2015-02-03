@@ -143,7 +143,7 @@ namespace koto
     namespace detail
     {
         template<typename T, typename E>
-        class encoding_utf16_base : public static_encoding<E>
+        class encoding_utf16_base : public static_encoding<T>
         {
         public:
             typedef char16_t char_type;
@@ -158,20 +158,30 @@ namespace koto
                 return utf16::length<E>(str, str + len);
             }
 
-            template<typename F>
-            static basic_vchar_t<vchar_buffer_size, F> element(const char_type *str, const size_t index)
+            template<typename F, typename U>
+            static basic_vchar_t<vchar_buffer_size, F> element(const char_type *str, const size_t index, const U *u)
             {
-                utf8::unchecked::advance(str, index);
+                if(u->length() == u->size())
+                {
+                    return basic_vchar_t<vchar_buffer_size, F>(str + index, 1);
+                }
+
+                utf16::unchecked::template advance<E>(str, index);
                 const char_type *f = str;
-                utf8::unchecked::next(str);
+                utf16::unchecked::template next<E>(str);
                 return basic_vchar_t<vchar_buffer_size, F>(f, str - f);
             }
 
-            template<typename F>
-            static basic_vchar_t<vchar_buffer_size, F> element(const char_type *str)
+            template<typename F, typename U>
+            static basic_vchar_t<vchar_buffer_size, F> element(const char_type *str, const U *u)
             {
+                if(u->length() == u->size())
+                {
+                    return basic_vchar_t<vchar_buffer_size, F>(str, 1);
+                }
+
+                utf16::unchecked::template next<E>(str);
                 const char_type *f = str;
-                utf8::unchecked::next(str);
                 return basic_vchar_t<vchar_buffer_size, F>(f, str - f);
             }
 

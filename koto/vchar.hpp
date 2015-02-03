@@ -12,22 +12,9 @@ namespace koto
     template<size_t S, typename E>
     class basic_vchar_t : public detail::string_base<E, detail::is_same<E, dynamic_encoding>::value>
     {
-        template<size_t N, typename F>
-        friend std::ostream &operator<<(std::ostream& stream, const basic_vchar_t<N, F>& c);
-
-        template<size_t N, typename F>
-        friend std::istream &operator>>(std::istream& stream, const basic_vchar_t<N, F>& c);
-
         typedef detail::string_base<E, detail::is_same<E, dynamic_encoding>::value> base_type;
         typedef basic_vchar_t<S, E> self_type;
         typedef E encoding_type;
-
-        struct value_types
-        {
-            static const unsigned char char_value = 0;
-            static const unsigned char u16_value  = 1;
-            static const unsigned char u32_value  = 2;
-        };
 
         typedef unsigned char value_type;
 
@@ -36,57 +23,34 @@ namespace koto
             template<size_t N, typename F>
             friend class basic_vchar_t;
         protected:
-            value_type value_type_;
             char char_buf_[S];
+            unsigned char size_;
 
             template<typename U>
             void write(const U *str, const size_t size)
             {
-                if(size > S)
+                if(size > S / sizeof(U))
                 {
                     throw bad_char_error();
                 }
 
-                static_cast<char *>(std::memcpy(&char_buf_, str, size * sizeof(U)))[size] = 0;
+                std::memcpy(&char_buf_, str, size * sizeof(U));
             }
         public:
-           vchar_base(const value_type vt)
-           : value_type_(vt)
+           vchar_base(const size_t size)
+           : size_(size)
            { }
 
-            void input(std::istream &stream)
+            template<typename T>
+            void input(T &stream)
             {
-                switch(value_type_)
-                {
-                    case value_types::char_value:
-                        throw not_implemented();
-                        break;
-                    case value_types::u16_value:
-                        throw not_implemented();
-                        break;
-                    case value_types::u32_value:
-                        throw not_implemented();
-                        break;
-                }
+                throw not_implemented();
             }
 
-            void output(std::ostream &stream) const
+            template<typename T>
+            void output(T &stream) const
             {
-                switch(value_type_)
-                {
-                    case value_types::char_value:
-                        for(int i = 0; i < S && char_buf_[i]; ++i)
-                        {
-                            stream.put(char_buf_[i]);
-                        }
-                        break;
-                    case value_types::u16_value:
-                        throw not_implemented();
-                        break;
-                    case value_types::u32_value:
-                        throw not_implemented();
-                        break;
-                }
+                stream.write(reinterpret_cast<const typename T::char_type *>(char_buf_), size_);
             }
 
             const char *c_str() const { return char_buf_; }
@@ -99,35 +63,10 @@ namespace koto
 
             typedef vchar_base base;
         public:
-            vchar(const char *str, const size_t size, const encoding *enc)
-            : base(value_types::char_value)
+            template<typename T>
+            vchar(const T *str, const size_t size, const encoding *enc)
+            : base(size)
             {
-                if(E::length(str, size) != 1)
-                {
-                    throw bad_char_error();
-                }
-
-                base::write(str, size);
-            }
-
-            vchar(const wchar_t *str, const size_t size, const encoding *enc)
-            : base(value_types::u32_value)
-            {
-                throw not_implemented();
-                base::write(str, size);
-            }
-
-            vchar(const uint16 *str, const size_t size, const encoding *enc)
-            : base(value_types::u16_value)
-            {
-                throw not_implemented();
-                base::write(str, size);
-            }
-
-            vchar(const uint32 *str, const size_t size, const encoding *enc)
-            : base(value_types::u32_value)
-            {
-                throw not_implemented();
                 base::write(str, size);
             }
         };
@@ -141,26 +80,9 @@ namespace koto
         private:
             const encoding *encoding_;
         public:
-            vchar_with_encoding(const char *str, const size_t size, const encoding *enc)
-            : base(value_types::char_value)
-            {
-                base::write(str, size);
-            }
-
-            vchar_with_encoding(const wchar_t *str, const size_t size, const encoding *enc)
-            : base(value_types::u32_value)
-            {
-                base::write(str, size);
-            }
-
-            vchar_with_encoding(const uint16 *str, const size_t size, const encoding *enc)
-            : base(value_types::u16_value)
-            {
-                base::write(str, size);
-            }
-
-            vchar_with_encoding(const uint32 *str, const size_t size, const encoding *enc)
-            : base(value_types::u32_value)
+            template<typename T>
+            vchar_with_encoding(const T *str, const size_t size, const encoding *enc)
+            : base(size)
             {
                 base::write(str, size);
             }
@@ -179,8 +101,6 @@ namespace koto
         vchar_type value_;
 
         value_type get_type() const { return value_.value_type_; }
-        void input(std::istream &stream) { value_.input(stream); }
-        void output(std::ostream &stream) const { value_.output(stream); }
     public:
         basic_vchar_t(const char *str, const size_t size, const encoding *enc = base_type::default_encoding_)
         : value_(str, size, enc)
@@ -190,16 +110,16 @@ namespace koto
         : value_(str, std::char_traits<char>::length(str), enc)
         { }
 
-        basic_vchar_t(const wchar_t *str, const size_t size)
-        : value_(str, size)
+        basic_vchar_t(const wchar_t *str, const size_t size, const encoding *enc = base_type::default_encoding_)
+        : value_(str, size, enc)
         { }
 
-        basic_vchar_t(const uint16 *str, const size_t size)
-        : value_(str, size)
+        basic_vchar_t(const char16_t *str, const size_t size, const encoding *enc = base_type::default_encoding_)
+        : value_(str, size, enc)
         { }
 
-        basic_vchar_t(const uint32 *str, const size_t size)
-        : value_(str, size)
+        basic_vchar_t(const char32_t *str, const size_t size, const encoding *enc = base_type::default_encoding_)
+        : value_(str, size, enc)
         { }
 
         ~basic_vchar_t()
@@ -214,24 +134,38 @@ namespace koto
         }
 
         const char *c_str() const { return value_.c_str(); }
+
+        // overload
+        template<size_t N, typename F>
+        friend std::ostream &operator<<(std::ostream& stream, const basic_vchar_t<N, F>& c)
+        {
+            c.value_.output(stream);
+            return stream;
+        }
+
+        template<size_t N, typename F>
+        friend std::wostream &operator<<(std::wostream& stream, const basic_vchar_t<N, F>& c)
+        {
+            c.value_.output(stream);
+            return stream;
+        }
+
+        template<size_t N, typename F>
+        friend std::istream &operator>>(std::istream& stream, const basic_vchar_t<N, F>& c)
+        {
+            c.value_.input(stream);
+            return stream;
+        }
+
+        template<size_t N, typename F>
+        friend std::wistream &operator>>(std::wistream& stream, const basic_vchar_t<N, F>& c)
+        {
+            c.value_.input(stream);
+            return stream;
+        }
     };
 
     typedef basic_vchar_t<vchar_buffer_size, encoding_utf8> vchar_t;
-
-    // overload
-    template<size_t S, typename E>
-    std::ostream &operator<<(std::ostream& stream, const basic_vchar_t<S, E>& c)
-    {
-        c.output(stream);
-        return stream;
-    }
-
-    template<size_t S, typename E>
-    std::istream &operator>>(std::istream& stream, basic_vchar_t<S, E>& c)
-    {
-        c.input(stream);
-        return stream;
-    }
 }
 
 #endif

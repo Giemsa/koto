@@ -66,24 +66,72 @@ namespace koto
         };
 
         template<typename E, typename T>
-        size_t length(T it, T end)
+        size_t length(T it, const T &end)
         {
             size_t len = 0;
             while(it != end)
             {
                 const char16_t c = *it;
-                if(c != 0)
+                ++it;
+                ++len;
+                if(it != end && E::is_surrogate_pair(c, *it))
                 {
                     ++it;
-                    ++len;
-                    if(it != end && E::is_surrogate_pair(c, *it))
-                    {
-                        ++it;
-                    }
                 }
             }
 
             return len;
+        }
+
+        namespace checked
+        {
+            template<typename E, typename T>
+            void next(T &it, const T &end)
+            {
+                if(it == end)
+                {
+                    return;
+                }
+
+                const char16_t c = *it;
+                ++it;
+                if(it != end && E::is_surrogate_pair(c, *it))
+                {
+                    ++it;
+                }
+            }
+
+            template<typename E, typename T, typename D>
+            void advance(T &it, const D n, const T &end)
+            {
+                for(D i = 0; i < n && it != end; ++i)
+                {
+                    next(it, end);
+                }
+            }
+        }
+
+        namespace unchecked
+        {
+            template<typename E, typename T>
+            void next(T &it)
+            {
+                const char16_t c = *it;
+                ++it;
+                if(E::is_surrogate_pair(c, *it))
+                {
+                    ++it;
+                }
+            }
+
+            template<typename E, typename T, typename D>
+            void advance(T &it, const D n)
+            {
+                for(D i = 0; i < n; ++i)
+                {
+                    next<E>(it);
+                }
+            }
         }
     }
 }
